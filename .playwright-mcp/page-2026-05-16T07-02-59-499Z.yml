@@ -1,0 +1,28 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - generic [ref=e23]:
+    - banner [ref=e24]:
+      - generic [ref=e25]:
+        - heading [level=2] [ref=e39]: "房间: aM0a"
+        - button [ref=e40]: 复制
+      - button [ref=e41] [cursor=pointer]: 进入演示
+    - generic [ref=e30]:
+      - button [expanded] [ref=e42]: ＋ 添加互动
+      - generic [ref=e38]: 添加一个互动环节开始
+  - dialog "添加互动环节" [ref=e46]:
+    - heading "添加互动环节" [level=2] [ref=e48]
+    - generic [ref=e49]:
+      - generic [ref=e50]:
+        - button "投票" [active] [ref=e51]
+        - button "问答" [ref=e52]
+        - button "词云" [ref=e53]
+      - textbox "互动标题" [ref=e54]
+      - generic [ref=e55]:
+        - textbox "选项 1" [ref=e56]
+        - textbox "选项 2" [ref=e57]
+      - button "创建" [disabled]
+    - button "Close" [ref=e58]:
+      - img
+      - generic [ref=e59]: Close

@@ -62,6 +62,14 @@ export async function GET(
   const interactionId = searchParams.get('interactionId');
   if (!interactionId) return NextResponse.json({ error: 'interactionId required' }, { status: 400 });
 
+  const interaction = getInteraction(interactionId);
+  if (!interaction) return NextResponse.json({ error: 'Interaction not found' }, { status: 404 });
+
+  if (interaction.type === 'wordcloud') {
+    const data = getWordCloudData(interactionId);
+    return NextResponse.json(data);
+  }
+
   const results = getVoteResults(interactionId);
   return NextResponse.json(results);
 }

@@ -28,6 +28,7 @@ export function RoomHeader({ roomCode }: { roomCode: string }) {
         <Button
           variant="outline"
           size="sm"
+          nativeButton={false}
           render={<Link href={`/room/${roomCode}/present`} target="_blank" />}
         >
           进入演示

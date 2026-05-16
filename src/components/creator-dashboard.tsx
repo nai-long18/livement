@@ -84,13 +84,13 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
             <div>
               <h3 className="text-xl font-semibold mb-4">{activeInteraction.title}</h3>
               {activeInteraction.type === 'poll' && (
-                <PollResults interactionId={activeId!} live={activeInteraction.status === 'live'} />
+                <PollResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} />
               )}
               {activeInteraction.type === 'qa' && (
-                <QaFeed interactionId={activeId!} />
+                <QaFeed roomCode={roomCode} interactionId={activeId!} />
               )}
               {activeInteraction.type === 'wordcloud' && (
-                <WordCloud interactionId={activeId!} live={activeInteraction.status === 'live'} />
+                <WordCloud roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} />
               )}
             </div>
           ) : (

@@ -1,0 +1,13 @@
+- generic [active] [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - generic [ref=e23]:
+    - banner [ref=e24]:
+      - generic [ref=e25]:
+        - 'heading "房间: aM0a" [level=2] [ref=e26]'
+        - button "复制" [ref=e27]
+      - button "进入演示" [ref=e29] [cursor=pointer]
+    - generic [ref=e30]:
+      - button "＋ 添加互动" [ref=e33]
+      - generic [ref=e38]: 添加一个互动环节开始

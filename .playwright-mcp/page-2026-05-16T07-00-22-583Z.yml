@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "LiveMent" [level=1] [ref=e4]
+      - paragraph [ref=e5]: 实时互动，三秒开始
+      - button "＋ 创建新房间" [ref=e6]
+      - generic [ref=e9]: 或
+      - generic [ref=e11]:
+        - textbox "输入房间码" [ref=e12]
+        - button "加入" [disabled]
+  - alert [ref=e13]

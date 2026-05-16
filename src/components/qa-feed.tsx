@@ -14,11 +14,12 @@ interface QuestionData {
   created_at: string;
 }
 
-export function QaFeed({ interactionId }: { interactionId: string }) {
+export function QaFeed({ roomCode, interactionId }: { roomCode: string; interactionId: string }) {
   const [questions, setQuestions] = useState<QuestionData[]>([]);
 
   async function fetchQuestions() {
-    const res = await fetch(`/api/room/${interactionId}/questions`);
+    const res = await fetch(`/api/room/${roomCode}/question?interactionId=${interactionId}`);
+    if (!res.ok) return;
     const data = await res.json();
     setQuestions(data);
   }
@@ -30,7 +31,7 @@ export function QaFeed({ interactionId }: { interactionId: string }) {
   }, [interactionId]);
 
   async function handleUpvote(questionId: string) {
-    await fetch(`/api/room/${interactionId}/questions`, {
+    await fetch(`/api/room/${roomCode}/question`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ questionId }),

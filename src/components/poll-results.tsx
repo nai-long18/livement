@@ -10,9 +10,11 @@ interface VoteResult {
 }
 
 export function PollResults({
+  roomCode,
   interactionId,
   live,
 }: {
+  roomCode: string;
   interactionId: string;
   live: boolean;
 }) {
@@ -23,7 +25,8 @@ export function PollResults({
   const [loading, setLoading] = useState(true);
 
   async function fetchResults() {
-    const res = await fetch(`/api/room/${interactionId}/vote`);
+    const res = await fetch(`/api/room/${roomCode}/vote?interactionId=${interactionId}`);
+    if (!res.ok) { setLoading(false); return; }
     const data = await res.json();
     setResults(data);
     setLoading(false);

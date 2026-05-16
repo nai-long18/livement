@@ -24,7 +24,11 @@
       "mcp__local_files__directory_tree",
       "Bash(mkdir -p \"C:\\\\Users\\\\ljh\\\\OneDrive\\\\Desktop\\\\Claude_test\\\\src\\\\app\\\\room\\\\[code]\\\\present\")",
       "Bash(mkdir -p \"C:\\\\Users\\\\ljh\\\\OneDrive\\\\Desktop\\\\Claude_test\\\\src\\\\app\\\\join\\\\[code]\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "mcp__browser__browser_snapshot",
+      "mcp__browser__browser_click",
+      "mcp__browser__browser_wait_for",
+      "mcp__browser__browser_fill_form"
     ]
   }
 }

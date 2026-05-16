@@ -1,0 +1,94 @@
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - generic [ref=e67]:
+          - navigation [ref=e68]:
+            - button "previous" [disabled] [ref=e69]:
+              - img "previous" [ref=e70]
+            - generic [ref=e72]:
+              - generic [ref=e73]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e74]:
+              - img "next" [ref=e75]
+          - img
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - img [ref=e79]
+            - generic "Latest available version is detected (16.2.6)." [ref=e81]: Next.js 16.2.6
+            - generic [ref=e82]: Turbopack
+          - img
+      - dialog "Runtime TypeError" [ref=e84]:
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - generic [ref=e91]: Runtime TypeError
+              - generic [ref=e92]:
+                - button "Copy Error Info" [ref=e93] [cursor=pointer]:
+                  - img [ref=e94]
+                - button "No related documentation found" [disabled] [ref=e96]:
+                  - img [ref=e97]
+                - button "Attach Node.js inspector" [ref=e99] [cursor=pointer]:
+                  - img [ref=e100]
+            - generic [ref=e109]: Cannot read properties of undefined (reading 'map')
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - paragraph [ref=e113]:
+                - img [ref=e115]
+                - generic [ref=e118]: src/components/poll-results.tsx (40:48) @ PollResults
+                - button "Open in editor" [ref=e119] [cursor=pointer]:
+                  - img [ref=e121]
+              - generic [ref=e124]:
+                - generic [ref=e125]: 38 | if (loading) return <p className="text-slate-400">加载中...</p>;
+                - generic [ref=e126]: 39 |
+                - generic [ref=e127]: "> 40 | const maxCount = Math.max(...results.options.map(o => o.count), 1);"
+                - generic [ref=e128]: "| ^"
+                - generic [ref=e129]: 41 |
+                - generic [ref=e130]: 42 | return (
+                - generic [ref=e131]: 43 | <div className="space-y-4">
+            - generic [ref=e132]:
+              - generic [ref=e133]:
+                - paragraph [ref=e134]:
+                  - text: Call Stack
+                  - generic [ref=e135]: "14"
+                - button "Show 11 ignore-listed frame(s)" [ref=e136] [cursor=pointer]:
+                  - text: Show 11 ignore-listed frame(s)
+                  - img [ref=e137]
+              - generic [ref=e139]:
+                - generic [ref=e140]:
+                  - text: PollResults
+                  - button "Open PollResults in editor" [ref=e141] [cursor=pointer]:
+                    - img [ref=e142]
+                - text: src/components/poll-results.tsx (40:48)
+              - generic [ref=e144]:
+                - generic [ref=e145]:
+                  - text: CreatorDashboard
+                  - button "Open CreatorDashboard in editor" [ref=e146] [cursor=pointer]:
+                    - img [ref=e147]
+                - text: src/components/creator-dashboard.tsx (87:17)
+              - generic [ref=e149]:
+                - generic [ref=e150]:
+                  - text: RoomPage
+                  - button "Open RoomPage in editor" [ref=e151] [cursor=pointer]:
+                    - img [ref=e152]
+                - text: src\app\room\[code]\page.tsx (10:10)
+        - generic [ref=e154]: "1"
+        - generic [ref=e155]: "2"
+    - generic [ref=e17] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e18]:
+        - img [ref=e19]
+      - generic [ref=e156]:
+        - button "Open issues overlay" [ref=e157]:
+          - generic [ref=e158]:
+            - generic [ref=e159]: "0"
+            - generic [ref=e160]: "1"
+          - generic [ref=e161]: Issue
+        - button "Collapse issues badge" [ref=e162]:
+          - img [ref=e163]
+  - generic [ref=e166]:
+    - img [ref=e167]
+    - heading "This page couldn’t load" [level=1] [ref=e169]
+    - paragraph [ref=e170]: Reload to try again, or go back.
+    - generic [ref=e171]:
+      - button "Reload" [ref=e173] [cursor=pointer]
+      - button "Back" [ref=e174] [cursor=pointer]

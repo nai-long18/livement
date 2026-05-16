@@ -18,16 +18,19 @@ const COLORS = [
 const FONT_SIZES = ['text-lg', 'text-xl', 'text-2xl', 'text-3xl', 'text-4xl', 'text-5xl'];
 
 export function WordCloud({
+  roomCode,
   interactionId,
   live,
 }: {
+  roomCode: string;
   interactionId: string;
   live: boolean;
 }) {
   const [words, setWords] = useState<WordData[]>([]);
 
   async function fetchWords() {
-    const res = await fetch(`/api/room/${interactionId}/words`);
+    const res = await fetch(`/api/room/${roomCode}/vote?interactionId=${interactionId}`);
+    if (!res.ok) return;
     const data = await res.json();
     setWords(data);
   }

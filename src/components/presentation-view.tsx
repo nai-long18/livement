@@ -65,13 +65,13 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
                 {activeInteraction.title}
               </h1>
               {activeInteraction.type === 'poll' && (
-                <PollResults interactionId={activeInteraction.id} live />
+                <PollResults roomCode={roomCode} interactionId={activeInteraction.id} live />
               )}
               {activeInteraction.type === 'qa' && (
-                <QaFeed interactionId={activeInteraction.id} />
+                <QaFeed roomCode={roomCode} interactionId={activeInteraction.id} />
               )}
               {activeInteraction.type === 'wordcloud' && (
-                <WordCloud interactionId={activeInteraction.id} live />
+                <WordCloud roomCode={roomCode} interactionId={activeInteraction.id} live />
               )}
             </motion.div>
           ) : (
