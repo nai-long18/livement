@@ -18,9 +18,10 @@ function CountUp({ target }: { target: number }) {
     const start = performance.now();
     const tick = (now: number) => {
       const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
+      const linearProgress = Math.min(elapsed / duration, 1);
+      const progress = 1 - Math.pow(1 - linearProgress, 3);
       setCount(Math.round(progress * target));
-      if (progress < 1) requestAnimationFrame(tick);
+      if (linearProgress < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }, [target]);
@@ -32,18 +33,20 @@ export function PollResults({
   interactionId,
   live,
   isCreator = false,
+  initialRevealed = false,
 }: {
   roomCode: string;
   interactionId: string;
   live: boolean;
   isCreator?: boolean;
+  initialRevealed?: boolean;
 }) {
   const [results, setResults] = useState<{ total: number; options: VoteResult[] }>({
     total: 0,
     options: [],
   });
   const [loading, setLoading] = useState(true);
-  const [revealed, setRevealed] = useState(false);
+  const [revealed, setRevealed] = useState(initialRevealed);
 
   async function fetchResults() {
     const res = await fetch(`/api/room/${roomCode}/vote?interactionId=${interactionId}`);
@@ -70,7 +73,8 @@ export function PollResults({
 
   if (loading) return <p className="text-slate-400">加载中...</p>;
 
-  const maxCount = Math.max(...results.options.map(o => o.count), 1);
+  const sortedOptions = [...results.options].sort((a, b) => b.count - a.count);
+  const maxCount = Math.max(...sortedOptions.map(o => o.count), 1);
 
   return (
     <div className="space-y-4">
@@ -96,7 +100,7 @@ export function PollResults({
       </AnimatePresence>
 
       <AnimatePresence>
-        {revealed && results.options.map((option, i) => {
+        {revealed && sortedOptions.map((option, i) => {
           const pct = (option.count / maxCount) * 100;
           const totalPct = results.total > 0 ? Math.round((option.count / results.total) * 100) : 0;
           return (
