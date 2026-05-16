@@ -23,12 +23,13 @@ interface PlacedWord {
 }
 
 function estimateSize(word: string, fontSizeRem: number) {
-  // Approximate: CJK char ~= fontSize wide, Latin char ~= 0.55 * fontSize
+  // CSS bounding box includes line-height (~1.5×) plus font metrics overhead.
+  // Use conservative factors to ensure collision-free placement.
   const px = fontSizeRem * 16;
-  const cjk = (word.match(/[一-鿿㐀-䶿]/g) || []).length;
+  const cjk = (word.match(/[一-鿿]/g) || []).length;
   const latin = word.length - cjk;
-  const width = cjk * px * 0.95 + latin * px * 0.55;
-  const height = px * 0.85;
+  const width = cjk * px * 1.05 + latin * px * 0.6 + 8; // +8px safe margin
+  const height = px * 1.65; // accounts for line-height + font metrics padding
   return { width, height };
 }
 
@@ -54,7 +55,7 @@ function findPlacement(
 ): { x: number; y: number } | null {
   const { width, height } = estimateSize(word, fontSizeRem);
   const maxR = Math.min(containerW, containerH) / 2 - Math.max(width, height) / 2;
-  const margin = Math.max(4, fontSizeRem * 1.5); // min gap between words
+  const margin = Math.max(8, fontSizeRem * 4); // generous gap between words
 
   // Spiral outward from center
   const startAngle = (seed * 47) % 360;
