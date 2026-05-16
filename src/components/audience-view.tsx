@@ -327,7 +327,7 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
               const config = JSON.parse(interaction.config);
               const revealed = config.revealed === true;
               return revealed ? (
-                <PollResults roomCode={roomCode} interactionId={interaction.id} live={false} />
+                <PollResults roomCode={roomCode} interactionId={interaction.id} live={false} initialRevealed={revealed} />
               ) : null;
             })()}
 

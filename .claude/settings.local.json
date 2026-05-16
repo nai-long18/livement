@@ -48,7 +48,14 @@
       "Bash(curl -s http://localhost:8080)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://prescribed-namespace-get-perhaps.trycloudflare.com\")",
       "mcp__browser__browser_resize",
-      "Bash(npx vitest *)"
+      "Bash(npx vitest *)",
+      "Bash(curl -s -X POST http://174.138.18.249:8080/api/room/XYAP/interaction -H 'Content-Type: application/json' -d '{\"type\":\"wordcloud\",\"title\":\"输入一个词描述你的心情\",\"config\":{}}')",
+      "Bash(curl -s -X PATCH http://174.138.18.249:8080/api/room/XYAP/interaction -H 'Content-Type: application/json' -d '{\"id\":\"0qA-_8_hkUHT-nHgE-Glh\",\"status\":\"live\"}')",
+      "Bash(curl -s \"http://174.138.18.249:8080/api/room/XYAP/vote?interactionId=0qA-_8_hkUHT-nHgE-Glh\")",
+      "mcp__browser__browser_run_code_unsafe",
+      "Bash(node -e \"process.stdin.setEncoding\\('utf8'\\); let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>console.log\\(JSON.stringify\\(JSON.parse\\(d\\),null,2\\)\\)\\)\")",
+      "Bash(node *)",
+      "mcp__browser__browser_evaluate"
     ]
   }
 }
