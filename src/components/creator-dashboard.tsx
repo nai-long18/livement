@@ -10,6 +10,7 @@ import { QaFeed } from '@/components/qa-feed';
 import { WordCloud } from '@/components/word-cloud';
 import { useSSE } from '@/hooks/use-sse';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/toast';
 
@@ -18,6 +19,7 @@ interface InteractionData {
   type: 'poll' | 'qa' | 'wordcloud';
   title: string;
   status: 'pending' | 'live' | 'closed';
+  config?: string;
 }
 
 export function CreatorDashboard({ roomCode }: { roomCode: string }) {
@@ -25,6 +27,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showMobileQueue, setShowMobileQueue] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchInteractions = useCallback(async () => {
     const res = await fetch(`/api/room/${roomCode}/interaction`);
@@ -79,6 +82,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
         <InteractionQueue
           interactions={interactions}
           activeId={activeId}
+          searchQuery={searchQuery}
           onSelect={(id) => { setActiveId(id); setShowMobileQueue(false); }}
           onToggleStatus={handleToggleStatus}
           onDelete={handleDelete}
@@ -112,23 +116,45 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
                 <div className="h-10 bg-slate-100 dark:bg-slate-800 rounded" />
               </div>
             </div>
-          ) : activeInteraction ? (
-            <div>
-              <h3 className="text-lg lg:text-xl font-semibold mb-4">{activeInteraction.title}</h3>
-              {activeInteraction.type === 'poll' && (
-                <PollResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} />
-              )}
-              {activeInteraction.type === 'qa' && (
-                <QaFeed roomCode={roomCode} interactionId={activeId!} />
-              )}
-              {activeInteraction.type === 'wordcloud' && (
-                <WordCloud roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} />
-              )}
-            </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-slate-400 text-sm lg:text-base">
-              添加一个互动环节开始
-            </div>
+            <>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="relative flex-1 max-w-md">
+                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <Input
+                    placeholder="搜索互动、问题、词云..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+                {searchQuery && (
+                  <Button variant="ghost" size="sm" onClick={() => setSearchQuery('')}>
+                    清除
+                  </Button>
+                )}
+              </div>
+              {activeInteraction ? (
+                <div>
+                  <h3 className="text-lg lg:text-xl font-semibold mb-4">{activeInteraction.title}</h3>
+                  {activeInteraction.type === 'poll' && (
+                    <PollResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
+                  )}
+                  {activeInteraction.type === 'qa' && (
+                    <QaFeed roomCode={roomCode} interactionId={activeId!} isCreator searchQuery={searchQuery} />
+                  )}
+                  {activeInteraction.type === 'wordcloud' && (
+                    <WordCloud roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} highlightWord={searchQuery} />
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-400 text-sm lg:text-base">
+                  添加一个互动环节开始
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
