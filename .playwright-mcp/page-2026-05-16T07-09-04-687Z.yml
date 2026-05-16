@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e15]:
+      - heading "你最喜欢哪个前端框架？" [level=2] [ref=e16]
+      - generic [ref=e21]:
+        - generic [ref=e22] [cursor=pointer]:
+          - radio "React" [checked] [ref=e23]
+          - generic [ref=e24]: React
+        - generic [ref=e25] [cursor=pointer]:
+          - radio "Vue" [ref=e26]
+          - generic [ref=e27]: Vue
+        - button "提交投票" [ref=e28]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

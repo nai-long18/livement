@@ -28,7 +28,10 @@
       "mcp__browser__browser_snapshot",
       "mcp__browser__browser_click",
       "mcp__browser__browser_wait_for",
-      "mcp__browser__browser_fill_form"
+      "mcp__browser__browser_fill_form",
+      "mcp__browser__browser_console_messages",
+      "mcp__browser__browser_tabs",
+      "mcp__memory__add_observations"
     ]
   }
 }

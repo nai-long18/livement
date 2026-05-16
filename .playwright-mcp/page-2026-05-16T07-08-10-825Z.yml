@@ -1,0 +1,27 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - 'heading "房间: aM0a" [level=2] [ref=e5]'
+        - button "复制" [ref=e6]
+      - button "进入演示" [ref=e8] [cursor=pointer]
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - button "＋ 添加互动" [ref=e12]
+        - generic [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]: 投票
+          - generic [ref=e29]: 你最喜欢哪个前端框架？
+          - button "关闭" [active] [ref=e46]
+      - generic [ref=e31]:
+        - heading "你最喜欢哪个前端框架？" [level=3] [ref=e32]
+        - generic [ref=e33]:
+          - paragraph [ref=e34]: 共 0 票
+          - generic [ref=e36]:
+            - generic [ref=e37]: React
+            - generic [ref=e38]: 0 票
+          - generic [ref=e41]:
+            - generic [ref=e42]: Vue
+            - generic [ref=e43]: 0 票
+  - button "Open Next.js Dev Tools" [ref=e23] [cursor=pointer]:
+    - img [ref=e24]
+  - alert [ref=e45]
