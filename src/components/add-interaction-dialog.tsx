@@ -26,13 +26,19 @@ export function AddInteractionDialog({
   const [title, setTitle] = useState('');
   const [options, setOptions] = useState(['', '']);
   const [multiple, setMultiple] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState('');
+  const [autoClose, setAutoClose] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
 
-    const config = type === 'poll' ? { options: options.filter(Boolean), multiple } : {};
+    const config: Record<string, unknown> = type === 'poll' ? { options: options.filter(Boolean), multiple } : {};
+    if (timerSeconds) {
+      config.timerSeconds = parseInt(timerSeconds);
+      config.autoClose = autoClose;
+    }
 
     await fetch(`/api/room/${roomCode}/interaction`, {
       method: 'POST',
@@ -108,6 +114,41 @@ export function AddInteractionDialog({
               </label>
             </div>
           )}
+
+          <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <p className="text-xs text-slate-500">倒计时（可选）</p>
+            <div className="flex gap-1.5 flex-wrap">
+              {[30, 60, 90, 120].map(s => (
+                <Button
+                  key={s}
+                  type="button"
+                  variant={timerSeconds === String(s) ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setTimerSeconds(String(s))}
+                >
+                  {s}s
+                </Button>
+              ))}
+              <Input
+                placeholder="自定义"
+                value={timerSeconds}
+                onChange={e => setTimerSeconds(e.target.value)}
+                className="w-20 h-8 text-sm"
+                type="number"
+              />
+            </div>
+            {timerSeconds && (
+              <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoClose}
+                  onChange={e => setAutoClose(e.target.checked)}
+                  className="w-4 h-4 accent-primary rounded"
+                />
+                时间到自动关闭
+              </label>
+            )}
+          </div>
 
           <Button type="submit" disabled={submitting || !title.trim()} className="w-full">
             {submitting ? '创建中...' : '创建'}

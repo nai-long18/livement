@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QaFeed } from '@/components/qa-feed';
 import { PollResults } from '@/components/poll-results';
+import { CountdownTimer } from '@/components/countdown-timer';
 
 interface ActiveInteraction {
   id: string;
@@ -212,6 +213,13 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
           className="w-full max-w-md"
         >
           <Card className="p-6 space-y-4">
+            {interaction && (() => {
+              const cfg = JSON.parse(interaction.config);
+              if (cfg.timerSeconds && cfg.timerStartedAt) {
+                return <CountdownTimer timerSeconds={cfg.timerSeconds} timerStartedAt={cfg.timerStartedAt} />;
+              }
+              return null;
+            })()}
             <h2 className="text-xl font-semibold text-center">{interaction.title}</h2>
 
             {interaction.type === 'poll' && !submitted && (

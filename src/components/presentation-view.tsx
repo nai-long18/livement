@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { PollResults } from '@/components/poll-results';
 import { QaFeed } from '@/components/qa-feed';
 import { WordCloud } from '@/components/word-cloud';
+import { CountdownTimer } from '@/components/countdown-timer';
 import QRCode from 'qrcode';
 
 export function PresentationView({ roomCode }: { roomCode: string }) {
@@ -18,7 +19,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
     status: string;
     config?: string;
   } | null>(null);
-  const [participantCount, setParticipantCount] = useState(0);
+  const [participantCount, setParticipantCount] = useState({ creators: 0, audience: 0 });
   const [showQR, setShowQR] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState('');
 
@@ -29,6 +30,9 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
   }, [roomCode]);
 
   const { isConnected } = useSSE(roomCode, (event) => {
+    if (event.type === 'participants.update') {
+      setParticipantCount(event.data as { creators: number; audience: number });
+    }
     if (event.type === 'interaction.update') {
       const data = event.data as { id: string; type: string; title: string; status: string; config?: string };
       if (data.status === 'live') {
@@ -37,7 +41,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
         setActiveInteraction(null);
       }
     }
-  });
+  }, 'creator');
 
   // Fetch current active interaction on mount
   useEffect(() => {
@@ -67,6 +71,13 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
               exit={{ opacity: 0, y: -30 }}
               className="w-full max-w-4xl"
             >
+              {activeInteraction.config && (() => {
+                const cfg = JSON.parse(activeInteraction.config);
+                if (cfg.timerSeconds && cfg.timerStartedAt) {
+                  return <CountdownTimer timerSeconds={cfg.timerSeconds} timerStartedAt={cfg.timerStartedAt} />;
+                }
+                return null;
+              })()}
               <h1 className="text-3xl md:text-5xl font-bold text-center mb-8">
                 {activeInteraction.title}
               </h1>
@@ -102,7 +113,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
       <footer className="h-14 border-t border-slate-800 flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <span className="text-slate-500 text-sm">
-            参与人数: {participantCount}
+            👤 {participantCount.creators} · 👥 {participantCount.audience}
           </span>
           <button
             onClick={() => setShowQR(!showQR)}

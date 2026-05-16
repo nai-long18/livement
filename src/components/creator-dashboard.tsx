@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/toast';
+import { CountdownTimer } from '@/components/countdown-timer';
 
 interface InteractionData {
   id: string;
@@ -28,6 +29,10 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
   const [loading, setLoading] = useState(true);
   const [showMobileQueue, setShowMobileQueue] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [participantCount, setParticipantCount] = useState({ creators: 0, audience: 0 });
+  const [showExport, setShowExport] = useState(false);
+
+  const typeLabel: Record<string, string> = { poll: '投票', qa: '问答', wordcloud: '词云' };
 
   const fetchInteractions = useCallback(async () => {
     const res = await fetch(`/api/room/${roomCode}/interaction`);
@@ -44,11 +49,14 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { isConnected } = useSSE(roomCode, (event) => {
+    if (event.type === 'participants.update') {
+      setParticipantCount(event.data as { creators: number; audience: number });
+    }
     if (event.type === 'interaction.update' || event.type === 'vote.update' ||
         event.type === 'question.new' || event.type === 'wordcloud.update') {
       fetchInteractions();
     }
-  });
+  }, 'creator');
 
   const { toast } = useToast();
 
@@ -135,10 +143,92 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
                     清除
                   </Button>
                 )}
+                <span className="text-xs text-slate-500">
+                  👤 {participantCount.creators} · 👥 {participantCount.audience}
+                </span>
+                <div className="relative">
+                  <Button variant="outline" size="sm" onClick={() => setShowExport(!showExport)}>
+                    导出数据
+                  </Button>
+                  {showExport && (
+                    <div className="absolute right-0 top-full mt-1 bg-card border rounded-lg shadow-lg z-50 py-1 min-w-[140px]">
+                      {interactions.filter(i => i.type === 'poll' || i.type === 'qa' || i.type === 'wordcloud').map(i => (
+                        <a
+                          key={i.id}
+                          href={`/api/room/${roomCode}/export?type=${i.type}&interactionId=${i.id}`}
+                          className="block px-3 py-1.5 text-sm hover:bg-slate-100 dark:hover:bg-slate-800"
+                          onClick={() => setShowExport(false)}
+                        >
+                          导出{typeLabel[i.type]}数据
+                        </a>
+                      ))}
+                      <button
+                        className="block w-full text-left px-3 py-1.5 text-sm text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        onClick={() => setShowExport(false)}
+                      >
+                        取消
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
               {activeInteraction ? (
                 <div>
+                  {activeInteraction.config && (() => {
+                    const cfg = JSON.parse(activeInteraction.config);
+                    if (cfg.timerSeconds && cfg.timerStartedAt) {
+                      return (
+                        <CountdownTimer
+                          timerSeconds={cfg.timerSeconds}
+                          timerStartedAt={cfg.timerStartedAt}
+                          onExpired={async () => {
+                            if (cfg.autoClose && activeId) {
+                              await fetch(`/api/room/${roomCode}/interaction`, {
+                                method: 'PATCH',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ id: activeId, status: 'closed' }),
+                              });
+                              if (activeInteraction.type === 'poll') {
+                                await fetch(`/api/room/${roomCode}/interaction`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ id: activeId, config: { revealed: true } }),
+                                });
+                              }
+                              toast('倒计时结束，互动已关闭', 'info');
+                              fetchInteractions();
+                            }
+                          }}
+                        />
+                      );
+                    }
+                    return null;
+                  })()}
                   <h3 className="text-lg lg:text-xl font-semibold mb-4">{activeInteraction.title}</h3>
+                  {activeInteraction.config && (() => {
+                    const cfg = JSON.parse(activeInteraction.config);
+                    if (cfg.timerSeconds && !cfg.timerStartedAt) {
+                      return (
+                        <Button
+                          size="sm"
+                          onClick={async () => {
+                            await fetch(`/api/room/${roomCode}/interaction`, {
+                              method: 'PATCH',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                id: activeId,
+                                config: { timerStartedAt: new Date().toISOString() },
+                              }),
+                            });
+                            fetchInteractions();
+                          }}
+                        >
+                          开始倒计时 ({cfg.timerSeconds}s)
+                        </Button>
+                      );
+                    }
+                    return null;
+                  })()}
                   {activeInteraction.type === 'poll' && (
                     <PollResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
                   )}
