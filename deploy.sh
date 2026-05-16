@@ -35,6 +35,7 @@ echo "=== Step 7: 配置 Nginx 反向代理 ==="
 sudo tee /etc/nginx/sites-available/livement > /dev/null << 'NGINX'
 server {
     listen 80;
+    listen 8080;
     server_name _;
 
     location / {
