@@ -27,7 +27,9 @@ vi.mock('../db', () => {
       id TEXT PRIMARY KEY, interaction_id TEXT NOT NULL REFERENCES interaction(id) ON DELETE CASCADE,
       content TEXT NOT NULL, asker_name TEXT DEFAULT '', asker_id TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      upvotes INTEGER NOT NULL DEFAULT 0
+      upvotes INTEGER NOT NULL DEFAULT 0,
+      answered INTEGER NOT NULL DEFAULT 0,
+      pinned INTEGER NOT NULL DEFAULT 0
     );
     CREATE INDEX IF NOT EXISTS idx_vote_voter ON vote(interaction_id, voter_id);
   `);
