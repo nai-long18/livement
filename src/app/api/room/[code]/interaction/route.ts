@@ -69,3 +69,21 @@ export async function PATCH(
 
   return NextResponse.json({ success: true });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ code: string }> }
+) {
+  const { code } = await params;
+  const room = getRoom(code);
+  if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 });
+
+  const { deleteInteraction } = await import('@/lib/interaction');
+  deleteInteraction(id);
+
+  return NextResponse.json({ success: true });
+}

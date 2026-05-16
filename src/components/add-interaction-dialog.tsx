@@ -25,13 +25,14 @@ export function AddInteractionDialog({
   const [type, setType] = useState<InteractionType>('poll');
   const [title, setTitle] = useState('');
   const [options, setOptions] = useState(['', '']);
+  const [multiple, setMultiple] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
 
-    const config = type === 'poll' ? { options: options.filter(Boolean), multiple: false } : {};
+    const config = type === 'poll' ? { options: options.filter(Boolean), multiple } : {};
 
     await fetch(`/api/room/${roomCode}/interaction`, {
       method: 'POST',
@@ -96,6 +97,15 @@ export function AddInteractionDialog({
                   }}
                 />
               ))}
+              <label className="flex items-center gap-2 text-sm text-slate-500 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={multiple}
+                  onChange={e => setMultiple(e.target.checked)}
+                  className="w-4 h-4 accent-primary rounded"
+                />
+                允许多选
+              </label>
             </div>
           )}
 

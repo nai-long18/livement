@@ -60,6 +60,10 @@ export function getInteraction(id: string): Interaction | undefined {
   return db.prepare('SELECT * FROM interaction WHERE id = ?').get(id) as Interaction | undefined;
 }
 
+export function deleteInteraction(id: string): void {
+  db.prepare('DELETE FROM interaction WHERE id = ?').run(id);
+}
+
 // --- Votes ---
 
 export interface VoteResult {

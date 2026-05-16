@@ -36,6 +36,8 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [interaction, setInteraction] = useState<ActiveInteraction | null>(null);
   const [selectedOption, setSelectedOption] = useState('');
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [isMultiple, setIsMultiple] = useState(false);
   const [questionText, setQuestionText] = useState('');
   const [askerName, setAskerName] = useState('');
   const [wordInput, setWordInput] = useState('');
@@ -58,6 +60,7 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
           try {
             const config = JSON.parse(live.config);
             if (config.options) setPollOptions(config.options);
+            if (config.multiple) setIsMultiple(config.multiple);
           } catch { setPollOptions([]); }
         } else {
           setPageState('waiting');
@@ -77,7 +80,8 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
         try {
           const config = JSON.parse(data.config);
           if (config.options) setPollOptions(config.options);
-          else setPollOptions([]);
+          if (config.multiple) setIsMultiple(config.multiple);
+          else { setPollOptions([]); setIsMultiple(false); }
         } catch { setPollOptions([]); }
       } else if (data.status === 'closed' && interaction?.id === data.id) {
         setInteraction(null);
@@ -89,18 +93,24 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
   });
 
   async function submitVote() {
-    if (!sessionId || !interaction || !selectedOption) return;
-    const res = await fetch(`/api/room/${roomCode}/vote`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        interactionId: interaction.id,
-        optionText: selectedOption,
-        voterId: sessionId,
-      }),
-    });
-    const data = await res.json();
-    setResultPreview(data);
+    if (!sessionId || !interaction) return;
+    if (!isMultiple && !selectedOption) return;
+    if (isMultiple && selectedOptions.length === 0) return;
+
+    const optionsToSubmit = isMultiple ? selectedOptions : [selectedOption];
+
+    for (const opt of optionsToSubmit) {
+      await fetch(`/api/room/${roomCode}/vote`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          interactionId: interaction.id,
+          optionText: opt,
+          voterId: sessionId,
+        }),
+      });
+    }
+    setResultPreview({ total: optionsToSubmit.length });
     setSubmitted(true);
   }
 
@@ -203,27 +213,46 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
 
             {interaction.type === 'poll' && !submitted && (
               <div className="space-y-2">
+                {isMultiple && (
+                  <p className="text-xs text-slate-400 -mb-1">可多选</p>
+                )}
                 {pollOptions.map((option, i) => (
                   <label
                     key={i}
                     className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                      selectedOption === option
-                        ? 'border-primary bg-primary/10'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                      isMultiple
+                        ? selectedOptions.includes(option)
+                          ? 'border-primary bg-primary/10'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                        : selectedOption === option
+                          ? 'border-primary bg-primary/10'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
                     }`}
                   >
                     <input
-                      type="radio"
+                      type={isMultiple ? 'checkbox' : 'radio'}
                       name="poll-option"
                       value={option}
-                      checked={selectedOption === option}
-                      onChange={e => setSelectedOption(e.target.value)}
-                      className="w-4 h-4 accent-primary"
+                      checked={isMultiple ? selectedOptions.includes(option) : selectedOption === option}
+                      onChange={e => {
+                        if (isMultiple) {
+                          setSelectedOptions(prev =>
+                            e.target.checked ? [...prev, option] : prev.filter(o => o !== option)
+                          );
+                        } else {
+                          setSelectedOption(e.target.value);
+                        }
+                      }}
+                      className="w-4 h-4 accent-primary rounded"
                     />
                     <span>{option}</span>
                   </label>
                 ))}
-                <Button onClick={submitVote} disabled={!selectedOption} className="w-full mt-3">
+                <Button
+                  onClick={submitVote}
+                  disabled={isMultiple ? selectedOptions.length === 0 : !selectedOption}
+                  className="w-full mt-3"
+                >
                   提交投票
                 </Button>
               </div>
@@ -269,7 +298,11 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
                   variant="ghost"
                   size="sm"
                   className="mt-2"
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setSelectedOption('');
+                    setSelectedOptions([]);
+                  }}
                 >
                   {interaction.type === 'qa' ? '再提一个问题' : '修改回答'}
                 </Button>

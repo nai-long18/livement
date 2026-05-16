@@ -11,6 +11,7 @@ import { WordCloud } from '@/components/word-cloud';
 import { useSSE } from '@/hooks/use-sse';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/components/toast';
 
 interface InteractionData {
   id: string;
@@ -46,6 +47,8 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
     }
   });
 
+  const { toast } = useToast();
+
   async function handleToggleStatus(id: string, currentStatus: string) {
     const newStatus = currentStatus === 'live' ? 'closed' : 'live';
     await fetch(`/api/room/${roomCode}/interaction`, {
@@ -53,6 +56,14 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status: newStatus }),
     });
+    toast(newStatus === 'live' ? '互动已开启' : '互动已关闭', 'success');
+    fetchInteractions();
+  }
+
+  async function handleDelete(id: string) {
+    await fetch(`/api/room/${roomCode}/interaction?id=${id}`, { method: 'DELETE' });
+    if (activeId === id) setActiveId(null);
+    toast('互动已删除', 'success');
     fetchInteractions();
   }
 
@@ -70,6 +81,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
           activeId={activeId}
           onSelect={(id) => { setActiveId(id); setShowMobileQueue(false); }}
           onToggleStatus={handleToggleStatus}
+          onDelete={handleDelete}
         />
       </div>
     </div>

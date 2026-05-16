@@ -110,7 +110,24 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
             {showQR ? '隐藏二维码' : '显示二维码'}
           </button>
         </div>
-        <span className="text-slate-700 text-xs">Powered by LiveMent</span>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (document.fullscreenElement) {
+                document.exitFullscreen();
+              } else {
+                document.documentElement.requestFullscreen();
+              }
+            }}
+            className="text-slate-500 text-sm hover:text-slate-300 transition-colors"
+            title="全屏"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+            </svg>
+          </button>
+          <span className="text-slate-700 text-xs">Powered by LiveMent</span>
+        </div>
       </footer>
 
       {/* QR Overlay */}
