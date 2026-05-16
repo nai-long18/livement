@@ -147,27 +147,30 @@ export function updateQuestionStatus(
   id: string,
   updates: { answered?: boolean; pinned?: boolean }
 ): void {
-  const sets: string[] = [];
-  const params: unknown[] = [];
+  const run = db.transaction(() => {
+    const sets: string[] = [];
+    const params: unknown[] = [];
 
-  if (updates.answered !== undefined) {
-    sets.push('answered = ?');
-    params.push(updates.answered ? 1 : 0);
-  }
-  if (updates.pinned !== undefined) {
-    // Unpin all other questions in the same interaction if pinning
-    if (updates.pinned) {
-      const q = db.prepare('SELECT interaction_id FROM question WHERE id = ?').get(id) as { interaction_id: string } | undefined;
-      if (q) {
-        db.prepare("UPDATE question SET pinned = 0 WHERE interaction_id = ? AND id != ?").run(q.interaction_id, id);
-      }
+    if (updates.answered !== undefined) {
+      sets.push('answered = ?');
+      params.push(updates.answered ? 1 : 0);
     }
-    sets.push('pinned = ?');
-    params.push(updates.pinned ? 1 : 0);
-  }
+    if (updates.pinned !== undefined) {
+      // Unpin all other questions in the same interaction if pinning
+      if (updates.pinned) {
+        const q = db.prepare('SELECT interaction_id FROM question WHERE id = ?').get(id) as { interaction_id: string } | undefined;
+        if (q) {
+          db.prepare("UPDATE question SET pinned = 0 WHERE interaction_id = ? AND id != ?").run(q.interaction_id, id);
+        }
+      }
+      sets.push('pinned = ?');
+      params.push(updates.pinned ? 1 : 0);
+    }
 
-  if (sets.length === 0) return;
-  db.prepare(`UPDATE question SET ${sets.join(', ')} WHERE id = ?`).run(...params, id);
+    if (sets.length === 0) return;
+    db.prepare(`UPDATE question SET ${sets.join(', ')} WHERE id = ?`).run(...params, id);
+  });
+  run();
 }
 
 // --- Word Cloud ---

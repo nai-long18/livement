@@ -66,7 +66,11 @@ export async function PATCH(
 
   // Status update mode (new)
   if (questionId && (answered !== undefined || pinned !== undefined)) {
-    const question = db.prepare('SELECT * FROM question WHERE id = ?').get(questionId);
+    const question = db.prepare(`
+      SELECT q.* FROM question q
+      JOIN interaction i ON i.id = q.interaction_id
+      WHERE q.id = ? AND i.room_id = ?
+    `).get(questionId, code);
     if (!question) return NextResponse.json({ error: 'Question not found' }, { status: 404 });
 
     updateQuestionStatus(questionId, { answered, pinned });
