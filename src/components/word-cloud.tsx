@@ -1,7 +1,7 @@
 // src/components/word-cloud.tsx
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface WordData {
@@ -15,22 +15,70 @@ const COLORS = [
   '#f59e0b', '#14b8a6', '#0ea5e9', '#d946ef',
 ];
 
-function seededPosition(word: string, index: number, total: number) {
-  const seed = word.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  // Golden-ratio spiral for even area-filling distribution
-  const goldenAngle = 137.508;
-  const angle = ((index * goldenAngle + seed * 47) % 360) * (Math.PI / 180);
-  // sqrt growth fills the circle evenly (not clustered at center)
-  const radiusPct = 12 + Math.sqrt((index + 0.5) / total) * 82;
-  // Per-word jitter to break up spiral regularity
-  const jx = ((seed * 7 + index * 11) % 14) - 7;
-  const jy = ((seed * 13 + index * 17) % 14) - 7;
-  return {
-    x: Math.cos(angle) * radiusPct + jx,
-    y: Math.sin(angle) * radiusPct * 0.78 + jy,
-    rotation: ((seed * 3 + index * 11) % 24) - 12,
-  };
+interface PlacedWord {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
+
+function estimateSize(word: string, fontSizeRem: number) {
+  // Approximate: CJK char ~= fontSize wide, Latin char ~= 0.55 * fontSize
+  const px = fontSizeRem * 16;
+  const cjk = (word.match(/[一-鿿㐀-䶿]/g) || []).length;
+  const latin = word.length - cjk;
+  const width = cjk * px * 0.95 + latin * px * 0.55;
+  const height = px * 0.85;
+  return { width, height };
+}
+
+function boxesOverlap(a: PlacedWord, b: PlacedWord, margin: number) {
+  const ax1 = a.x - a.w / 2 - margin;
+  const ax2 = a.x + a.w / 2 + margin;
+  const ay1 = a.y - a.h / 2 - margin;
+  const ay2 = a.y + a.h / 2 + margin;
+  const bx1 = b.x - b.w / 2;
+  const bx2 = b.x + b.w / 2;
+  const by1 = b.y - b.h / 2;
+  const by2 = b.y + b.h / 2;
+  return ax1 < bx2 && ax2 > bx1 && ay1 < by2 && ay2 > by1;
+}
+
+function findPlacement(
+  word: string,
+  fontSizeRem: number,
+  placed: PlacedWord[],
+  seed: number,
+  containerW: number,
+  containerH: number,
+): { x: number; y: number } | null {
+  const { width, height } = estimateSize(word, fontSizeRem);
+  const maxR = Math.min(containerW, containerH) / 2 - Math.max(width, height) / 2;
+  const margin = Math.max(4, fontSizeRem * 1.5); // min gap between words
+
+  // Spiral outward from center
+  const startAngle = (seed * 47) % 360;
+  for (let step = 0; step < 1200; step++) {
+    const r = (step / 1200) * maxR;
+    const a = (startAngle + step * 137.508) * (Math.PI / 180);
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r * 0.78;
+
+    const candidate: PlacedWord = { x, y, w: width, h: height };
+
+    // Clamp to container bounds
+    if (x - width / 2 < -containerW / 2 || x + width / 2 > containerW / 2) continue;
+    if (y - height / 2 < -containerH / 2 || y + height / 2 > containerH / 2) continue;
+
+    const overlaps = placed.some(p => boxesOverlap(candidate, p, margin));
+    if (!overlaps) return { x: Math.round(x), y: Math.round(y) };
+  }
+
+  return null; // fallback — shouldn't happen with reasonable word counts
+}
+
+const CONTAINER_W = 600;
+const CONTAINER_H = 480;
 
 export function WordCloud({
   roomCode,
@@ -42,14 +90,11 @@ export function WordCloud({
   live: boolean;
 }) {
   const [words, setWords] = useState<WordData[]>([]);
-  const prevCounts = useRef<Map<string, number>>(new Map());
 
   async function fetchWords() {
     const res = await fetch(`/api/room/${roomCode}/vote?interactionId=${interactionId}`);
     if (!res.ok) return;
     const data = (await res.json()) as WordData[];
-    // Track previous counts for grow/shrink detection
-    data.forEach(w => prevCounts.current.set(w.word, w.count));
     setWords(data);
   }
 
@@ -61,20 +106,41 @@ export function WordCloud({
 
   const maxCount = Math.max(...words.map(w => w.count), 1);
 
-  // Exponential size curve — popular words dominate visually
   const positioned = useMemo(() => {
-    const top = words.slice(0, 60);
-    return top.map((item, i) => {
-      const pos = seededPosition(item.word, i, top.length);
-      // Exponential scaling: size = 1 + (count/max)^0.6 * 3.5
-      // Using pow 0.6 makes mid-tier words larger than linear mapping
+    // Sort by count descending — largest words placed first (center)
+    const sorted = [...words]
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 60);
+
+    const seed = sorted.reduce((s, w) => s + w.word.charCodeAt(0), 0);
+    const placed: PlacedWord[] = [];
+
+    return sorted.map((item, i) => {
       const ratio = item.count / maxCount;
       const exponentialRatio = Math.pow(ratio, 0.6);
-      const size = 1.0 + exponentialRatio * 3.5; // 1.0rem to 4.5rem
+      const size = 1.0 + exponentialRatio * 3.5;
       const opacity = 0.55 + exponentialRatio * 0.45;
       const color = COLORS[i % COLORS.length];
 
-      return { ...item, ...pos, size, opacity, color, isTop: i === 0 && ratio > 0 };
+      const pos = findPlacement(item.word, size, placed, seed + i, CONTAINER_W, CONTAINER_H);
+
+      let x: number, y: number, rotation: number;
+      if (pos) {
+        x = pos.x;
+        y = pos.y;
+        rotation = ((seed * 3 + i * 11) % 20) - 10;
+      } else {
+        // Fallback: put at edge with deterministic offset
+        const fallbackAngle = (i * 137.5) * (Math.PI / 180);
+        const fallbackR = 180 + (i % 5) * 20;
+        x = Math.cos(fallbackAngle) * fallbackR;
+        y = Math.sin(fallbackAngle) * fallbackR * 0.78;
+        rotation = 0;
+      }
+
+      placed.push({ x, y, w: estimateSize(item.word, size).width, h: estimateSize(item.word, size).height });
+
+      return { ...item, x, y, rotation, size, opacity, color, isTop: i === 0 && ratio > 0 };
     });
   }, [words, maxCount]);
 
@@ -110,9 +176,9 @@ export function WordCloud({
               exit={{ opacity: 0, scale: 0 }}
               transition={{
                 type: 'spring',
-                stiffness: 180 - i * 2,
+                stiffness: 160 - i * 2,
                 damping: 16,
-                delay: Math.min(i * 0.03, 1.5),
+                delay: Math.min(i * 0.03, 1.2),
               }}
               className="absolute top-1/2 left-1/2 font-bold cursor-default select-none whitespace-nowrap"
               style={{
@@ -126,15 +192,13 @@ export function WordCloud({
               title={`${item.word} (${item.count})`}
             >
               {item.isTop && (
-                <motion.span
-                  className="absolute inset-0 rounded-full blur-xl"
+                <span
+                  className="absolute inset-0 rounded-full blur-xl pointer-events-none"
                   style={{
                     background: item.color,
-                    transform: 'translate(-50%, -50%) scale(1.5)',
-                    opacity: 0.15,
+                    transform: 'translate(-50%, -50%) scale(1.8)',
+                    opacity: 0.12,
                   }}
-                  animate={{ opacity: [0.1, 0.2, 0.1] }}
-                  transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
                 />
               )}
               {item.word}
