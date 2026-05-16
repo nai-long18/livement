@@ -86,10 +86,12 @@ export function WordCloud({
   roomCode,
   interactionId,
   live,
+  highlightWord = '',
 }: {
   roomCode: string;
   interactionId: string;
   live: boolean;
+  highlightWord?: string;
 }) {
   const [words, setWords] = useState<WordData[]>([]);
 
@@ -122,6 +124,11 @@ export function WordCloud({
       const exponentialRatio = Math.pow(ratio, 0.6);
       const size = 1.0 + exponentialRatio * 3.5;
       const opacity = 0.55 + exponentialRatio * 0.45;
+      let finalOpacity = opacity;
+      if (highlightWord.trim()) {
+        const match = item.word.toLowerCase().includes(highlightWord.trim().toLowerCase());
+        finalOpacity = match ? 1 : 0.12;
+      }
       const color = COLORS[i % COLORS.length];
 
       const pos = findPlacement(item.word, size, placed, seed + i, CONTAINER_W, CONTAINER_H);
@@ -142,9 +149,9 @@ export function WordCloud({
 
       placed.push({ x, y, w: estimateSize(item.word, size).width, h: estimateSize(item.word, size).height });
 
-      return { ...item, x, y, rotation, size, opacity, color, isTop: i === 0 && ratio > 0 };
+      return { ...item, x, y, rotation, size, opacity: finalOpacity, color, isTop: i === 0 && ratio > 0 };
     });
-  }, [words, maxCount]);
+  }, [words, maxCount, highlightWord]);
 
   if (words.length === 0) {
     return (

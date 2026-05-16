@@ -22,17 +22,23 @@ export function InteractionQueue({
   onSelect,
   onToggleStatus,
   onDelete,
+  searchQuery = '',
 }: {
   interactions: InteractionData[];
   activeId: string | null;
   onSelect: (id: string) => void;
   onToggleStatus: (id: string, current: string) => void;
   onDelete: (id: string) => void;
+  searchQuery?: string;
 }) {
+  const filtered = searchQuery.trim()
+    ? interactions.filter(i => i.title.toLowerCase().includes(searchQuery.toLowerCase()))
+    : interactions;
+
   return (
     <ScrollArea className="h-full">
       <div className="space-y-1 p-2">
-        {interactions.map(item => (
+        {filtered.map(item => (
           <div
             key={item.id}
             className={cn(
@@ -72,6 +78,9 @@ export function InteractionQueue({
             </button>
           </div>
         ))}
+        {filtered.length === 0 && searchQuery && (
+          <p className="text-slate-400 text-xs text-center py-4">没有匹配的互动</p>
+        )}
       </div>
     </ScrollArea>
   );
