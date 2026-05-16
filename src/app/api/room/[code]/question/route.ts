@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRoom } from '@/lib/room';
+import db from '@/lib/db';
 import {
   getInteraction,
   submitQuestion,
   getQuestions,
   upvoteQuestion,
+  updateQuestionStatus,
 } from '@/lib/interaction';
 import { publishToRoom } from '@/lib/sse';
 
@@ -49,19 +51,32 @@ export async function PATCH(
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const body = await request.json();
-  const { questionId } = body as { questionId: string };
+  const { questionId, answered, pinned } = body as {
+    questionId?: string;
+    answered?: boolean;
+    pinned?: boolean;
+  };
 
-  upvoteQuestion(questionId);
+  // Upvote mode (existing behavior)
+  if (questionId && answered === undefined && pinned === undefined) {
+    upvoteQuestion(questionId);
+    publishToRoom(code, { type: 'question.upvote', data: { questionId } });
+    return NextResponse.json({ success: true });
+  }
 
-  // Re-fetch and broadcast questions for the room
-  // We need the interaction ID — grab from the question
-  const { getInteraction, getQuestions } = await import('@/lib/interaction');
-  // Broadcast is scoped to room, so we just need to notify viewers
-  // The creator dashboard can refetch
+  // Status update mode (new)
+  if (questionId && (answered !== undefined || pinned !== undefined)) {
+    const question = db.prepare('SELECT * FROM question WHERE id = ?').get(questionId);
+    if (!question) return NextResponse.json({ error: 'Question not found' }, { status: 404 });
 
-  publishToRoom(code, { type: 'question.upvote', data: { questionId } });
+    updateQuestionStatus(questionId, { answered, pinned });
 
-  return NextResponse.json({ success: true });
+    const updated = db.prepare('SELECT * FROM question WHERE id = ?').get(questionId);
+    publishToRoom(code, { type: 'question.update', data: updated });
+    return NextResponse.json({ success: true, question: updated });
+  }
+
+  return NextResponse.json({ error: 'questionId required' }, { status: 400 });
 }
 
 export async function GET(

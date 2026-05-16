@@ -52,9 +52,20 @@ export async function PATCH(
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const body = await request.json();
-  const { id, status } = body as { id: string; status: 'pending' | 'live' | 'closed' };
+  const { id, status, config } = body as { id: string; status?: 'pending' | 'live' | 'closed'; config?: Record<string, unknown> };
 
-  updateInteractionStatus(id, status);
+  // Config update mode (for reveal flag etc.)
+  if (id && config && !status) {
+    const { updateInteractionConfig, getInteraction } = await import('@/lib/interaction');
+    updateInteractionConfig(id, config);
+    const updated = getInteraction(id);
+    if (updated) {
+      publishToRoom(code, { type: 'interaction.update', data: updated });
+    }
+    return NextResponse.json({ success: true, interaction: updated });
+  }
+
+  updateInteractionStatus(id, status!);
 
   if (status === 'live') {
     const { getInteraction, getVoteResults, getQuestions, getWordCloudData } = await import('@/lib/interaction');

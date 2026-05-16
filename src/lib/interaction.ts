@@ -64,6 +64,13 @@ export function deleteInteraction(id: string): void {
   db.prepare('DELETE FROM interaction WHERE id = ?').run(id);
 }
 
+export function updateInteractionConfig(id: string, config: Record<string, unknown>): void {
+  const existing = db.prepare('SELECT config FROM interaction WHERE id = ?').get(id) as { config: string } | undefined;
+  if (!existing) return;
+  const merged = { ...JSON.parse(existing.config), ...config };
+  db.prepare('UPDATE interaction SET config = ? WHERE id = ?').run(JSON.stringify(merged), id);
+}
+
 // --- Votes ---
 
 export interface VoteResult {
@@ -128,12 +135,39 @@ export function submitQuestion(
 
 export function getQuestions(interactionId: string) {
   return db.prepare(
-    'SELECT * FROM question WHERE interaction_id = ? ORDER BY upvotes DESC, created_at DESC'
+    'SELECT * FROM question WHERE interaction_id = ? ORDER BY pinned DESC, answered ASC, upvotes DESC, created_at DESC'
   ).all(interactionId);
 }
 
 export function upvoteQuestion(questionId: string): void {
   db.prepare('UPDATE question SET upvotes = upvotes + 1 WHERE id = ?').run(questionId);
+}
+
+export function updateQuestionStatus(
+  id: string,
+  updates: { answered?: boolean; pinned?: boolean }
+): void {
+  const sets: string[] = [];
+  const params: unknown[] = [];
+
+  if (updates.answered !== undefined) {
+    sets.push('answered = ?');
+    params.push(updates.answered ? 1 : 0);
+  }
+  if (updates.pinned !== undefined) {
+    // Unpin all other questions in the same interaction if pinning
+    if (updates.pinned) {
+      const q = db.prepare('SELECT interaction_id FROM question WHERE id = ?').get(id) as { interaction_id: string } | undefined;
+      if (q) {
+        db.prepare("UPDATE question SET pinned = 0 WHERE interaction_id = ? AND id != ?").run(q.interaction_id, id);
+      }
+    }
+    sets.push('pinned = ?');
+    params.push(updates.pinned ? 1 : 0);
+  }
+
+  if (sets.length === 0) return;
+  db.prepare(`UPDATE question SET ${sets.join(', ')} WHERE id = ?`).run(...params, id);
 }
 
 // --- Word Cloud ---

@@ -56,6 +56,10 @@ export function initializeDatabase(): void {
     CREATE INDEX IF NOT EXISTS idx_vote_voter ON vote(interaction_id, voter_id);
     CREATE INDEX IF NOT EXISTS idx_question_interaction ON question(interaction_id);
   `);
+
+  // Migrations — safe to run repeatedly
+  try { db.exec('ALTER TABLE question ADD COLUMN answered INTEGER NOT NULL DEFAULT 0'); } catch {}
+  try { db.exec('ALTER TABLE question ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0'); } catch {}
 }
 
 export default db;
