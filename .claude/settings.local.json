@@ -46,7 +46,9 @@
       "Bash(python3 -m json.tool)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080)",
       "Bash(curl -s http://localhost:8080)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://prescribed-namespace-get-perhaps.trycloudflare.com\")"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://prescribed-namespace-get-perhaps.trycloudflare.com\")",
+      "mcp__browser__browser_resize",
+      "Bash(npx vitest *)"
     ]
   }
 }

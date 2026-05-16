@@ -1,0 +1,15 @@
+- generic [ref=e1]:
+  - alert [ref=e13]
+  - generic [ref=e14]:
+    - banner [ref=e15]:
+      - generic [ref=e16]:
+        - 'heading "房间: Dgoj" [level=2] [ref=e17]'
+        - button "复制" [ref=e18]
+      - button "进入演示" [ref=e20] [cursor=pointer]
+    - generic [ref=e23]: 添加一个互动环节开始
+    - generic:
+      - button [active] [ref=e24]:
+        - img [ref=e25]
+      - generic [ref=e27]:
+        - generic [ref=e30]: 互动队列 (0)
+        - button "＋ 添加互动" [ref=e34]
