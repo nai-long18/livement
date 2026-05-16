@@ -43,7 +43,10 @@
       "Bash(curl -s http://174.138.18.249)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://174.138.18.249)",
       "Bash(curl -s -X POST http://174.138.18.249/api/room -H 'Content-Type: application/json' -d '{\"title\":\"线上测试\"}')",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080)",
+      "Bash(curl -s http://localhost:8080)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"https://prescribed-namespace-get-perhaps.trycloudflare.com\")"
     ]
   }
 }
