@@ -16,6 +16,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
     type: 'poll' | 'qa' | 'wordcloud';
     title: string;
     status: string;
+    config?: string;
   } | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
   const [showQR, setShowQR] = useState(false);
@@ -29,7 +30,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
 
   const { isConnected } = useSSE(roomCode, (event) => {
     if (event.type === 'interaction.update') {
-      const data = event.data as { id: string; type: string; title: string; status: string };
+      const data = event.data as { id: string; type: string; title: string; status: string; config?: string };
       if (data.status === 'live') {
         setActiveInteraction(data as typeof activeInteraction);
       } else if (data.status === 'closed' && activeInteraction?.id === data.id) {
@@ -70,7 +71,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
                 {activeInteraction.title}
               </h1>
               {activeInteraction.type === 'poll' && (
-                <PollResults roomCode={roomCode} interactionId={activeInteraction.id} live />
+                <PollResults roomCode={roomCode} interactionId={activeInteraction.id} live isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
               )}
               {activeInteraction.type === 'qa' && (
                 <QaFeed roomCode={roomCode} interactionId={activeInteraction.id} />

@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QaFeed } from '@/components/qa-feed';
+import { PollResults } from '@/components/poll-results';
 
 interface ActiveInteraction {
   id: string;
@@ -44,6 +46,7 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [resultPreview, setResultPreview] = useState<unknown>(null);
   const [pollOptions, setPollOptions] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetch(`/api/room/${roomCode}/interaction`)
@@ -260,6 +263,17 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
 
             {interaction.type === 'qa' && !submitted && (
               <div className="space-y-3">
+                <div className="relative">
+                  <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  <Input
+                    placeholder="搜索问题..."
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    className="pl-8 text-sm"
+                  />
+                </div>
                 <Input
                   placeholder="你的名字 (选填)"
                   value={askerName}
@@ -308,6 +322,19 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
                 </Button>
               </div>
             )}
+
+            {interaction.type === 'poll' && submitted && (() => {
+              const config = JSON.parse(interaction.config);
+              const revealed = config.revealed === true;
+              return revealed ? (
+                <PollResults roomCode={roomCode} interactionId={interaction.id} live={false} />
+              ) : null;
+            })()}
+
+            {interaction.type === 'qa' && (
+              <QaFeed roomCode={roomCode} interactionId={interaction.id} searchQuery={searchQuery} />
+            )}
+
           </Card>
         </motion.div>
       </AnimatePresence>
