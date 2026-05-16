@@ -23,13 +23,13 @@ interface PlacedWord {
 }
 
 function estimateSize(word: string, fontSizeRem: number) {
-  // CSS bounding box includes line-height (~1.5×) plus font metrics overhead.
-  // Use conservative factors to ensure collision-free placement.
+  // Conservative bounding-box estimate including line-height, font-bold,
+  // and font metrics overhead. Overestimate to guarantee no visual overlap.
   const px = fontSizeRem * 16;
   const cjk = (word.match(/[一-鿿]/g) || []).length;
   const latin = word.length - cjk;
-  const width = cjk * px * 1.05 + latin * px * 0.6 + 8; // +8px safe margin
-  const height = px * 1.65; // accounts for line-height + font metrics padding
+  const width = cjk * px * 1.15 + latin * px * 0.7 + 16;
+  const height = px * 1.8;
   return { width, height };
 }
 
@@ -55,12 +55,13 @@ function findPlacement(
 ): { x: number; y: number } | null {
   const { width, height } = estimateSize(word, fontSizeRem);
   const maxR = Math.min(containerW, containerH) / 2 - Math.max(width, height) / 2;
-  const margin = Math.max(8, fontSizeRem * 4); // generous gap between words
+  const margin = Math.max(12, fontSizeRem * 6);
 
-  // Spiral outward from center
+  // Spiral outward from center, exhaustive search
   const startAngle = (seed * 47) % 360;
-  for (let step = 0; step < 1200; step++) {
-    const r = (step / 1200) * maxR;
+  const totalSteps = 2000;
+  for (let step = 0; step < totalSteps; step++) {
+    const r = (step / totalSteps) * maxR;
     const a = (startAngle + step * 137.508) * (Math.PI / 180);
     const x = Math.cos(a) * r;
     const y = Math.sin(a) * r * 0.78;
@@ -78,8 +79,8 @@ function findPlacement(
   return null; // fallback — shouldn't happen with reasonable word counts
 }
 
-const CONTAINER_W = 600;
-const CONTAINER_H = 480;
+const CONTAINER_W = 640;
+const CONTAINER_H = 512;
 
 export function WordCloud({
   roomCode,
