@@ -17,14 +17,17 @@ const COLORS = [
 
 function seededPosition(word: string, index: number, total: number) {
   const seed = word.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  // Spread words across a roughly circular / oval area
-  const angle = ((seed * 137.5 + index * 97.3) % 360) * (Math.PI / 180);
-  const radiusBase = 30 + (index / total) * 45;
-  const radiusJitter = ((seed * 13 + index * 7) % 20) - 10;
-  const radius = radiusBase + radiusJitter;
+  // Golden-ratio spiral for even area-filling distribution
+  const goldenAngle = 137.508;
+  const angle = ((index * goldenAngle + seed * 47) % 360) * (Math.PI / 180);
+  // sqrt growth fills the circle evenly (not clustered at center)
+  const radiusPct = 12 + Math.sqrt((index + 0.5) / total) * 82;
+  // Per-word jitter to break up spiral regularity
+  const jx = ((seed * 7 + index * 11) % 14) - 7;
+  const jy = ((seed * 13 + index * 17) % 14) - 7;
   return {
-    x: Math.cos(angle) * radius,
-    y: Math.sin(angle) * radius * 0.7, // oval: wider than tall
+    x: Math.cos(angle) * radiusPct + jx,
+    y: Math.sin(angle) * radiusPct * 0.78 + jy,
     rotation: ((seed * 3 + index * 11) % 24) - 12,
   };
 }
@@ -91,7 +94,7 @@ export function WordCloud({
 
   return (
     <div className="relative min-h-[360px] flex items-center justify-center overflow-hidden">
-      <div className="relative w-full max-w-2xl" style={{ paddingBottom: '60%' }}>
+      <div className="relative w-full max-w-2xl" style={{ paddingBottom: '80%' }}>
         <AnimatePresence>
           {positioned.map((item, i) => (
             <motion.span
