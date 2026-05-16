@@ -3,15 +3,16 @@ import { createSSEStream, subscribeToRoom, publishToRoom } from '../sse';
 
 describe('sse', () => {
   it('subscribeToRoom returns unsubscribe function', () => {
-    const unsub = subscribeToRoom('R1', () => {});
+    const unsub = subscribeToRoom('R1', 'audience', () => {});
     expect(typeof unsub).toBe('function');
     unsub();
   });
 
   it('publishToRoom calls all listeners in the room', () => {
     const received: unknown[] = [];
-    const u1 = subscribeToRoom('R2', (e) => received.push(e.data));
-    const u2 = subscribeToRoom('R2', (e) => received.push(e.data));
+    const onT = (e: { type: string; data: unknown }) => { if (e.type === 't') received.push(e.data); };
+    const u1 = subscribeToRoom('R2', 'audience', onT);
+    const u2 = subscribeToRoom('R2', 'audience', onT);
     publishToRoom('R2', { type: 't', data: { v: 42 } });
     expect(received).toEqual([{ v: 42 }, { v: 42 }]);
     u1(); u2();
@@ -19,19 +20,21 @@ describe('sse', () => {
 
   it('publishToRoom does not call listeners in other rooms', () => {
     const received: unknown[] = [];
-    subscribeToRoom('RA', (e) => received.push(e.data));
+    const onT = (e: { type: string; data: unknown }) => { if (e.type === 't') received.push(e.data); };
+    subscribeToRoom('RA', 'audience', onT);
     publishToRoom('RB', { type: 't', data: 'nope' });
     expect(received).toHaveLength(0);
   });
 
   it('unsubscribe removes listener', () => {
     let count = 0;
-    const unsub = subscribeToRoom('R3', () => { count++; });
-    publishToRoom('R3', { type: 't', data: null });
-    expect(count).toBe(1);
+    const unsub = subscribeToRoom('R3', 'audience', () => { count++; });
+    // subscribe triggers participants.update broadcast → count = 1
+    publishToRoom('R3', { type: 't', data: null }); // count = 2
+    expect(count).toBe(2);
     unsub();
-    publishToRoom('R3', { type: 't', data: null });
-    expect(count).toBe(1);
+    publishToRoom('R3', { type: 't', data: null }); // still 2
+    expect(count).toBe(2);
   });
 
   it('createSSEStream creates a ReadableStream', () => {
