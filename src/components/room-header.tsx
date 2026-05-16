@@ -25,10 +25,12 @@ export function RoomHeader({ roomCode }: { roomCode: string }) {
         </Button>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`/room/${roomCode}/present`} target="_blank">
-            进入演示
-          </Link>
+        <Button
+          variant="outline"
+          size="sm"
+          render={<Link href={`/room/${roomCode}/present`} target="_blank" />}
+        >
+          进入演示
         </Button>
       </div>
     </header>

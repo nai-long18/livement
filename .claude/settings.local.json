@@ -12,7 +12,19 @@
       "Bash(npx create-next-app@latest tmp-livement --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
       "Bash(cp -r tmp-livement/public .)",
       "Bash(cp -r tmp-livement/src .)",
-      "Bash(cp -r tmp-livement/node_modules .)"
+      "Bash(cp -r tmp-livement/node_modules .)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "mcp__local_files__list_directory",
+      "mcp__local_files__read_text_file",
+      "mcp__local_files__write_file",
+      "mcp__local_files__edit_file",
+      "mcp__local_files__list_allowed_directories",
+      "mcp__local_files__directory_tree",
+      "Bash(mkdir -p \"C:\\\\Users\\\\ljh\\\\OneDrive\\\\Desktop\\\\Claude_test\\\\src\\\\app\\\\room\\\\[code]\\\\present\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\ljh\\\\OneDrive\\\\Desktop\\\\Claude_test\\\\src\\\\app\\\\join\\\\[code]\")",
+      "Bash(npm run *)"
     ]
   }
 }
