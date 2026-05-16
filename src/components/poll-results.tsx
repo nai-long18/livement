@@ -46,7 +46,9 @@ export function PollResults({
     options: [],
   });
   const [loading, setLoading] = useState(true);
-  const [revealed, setRevealed] = useState(initialRevealed);
+  // For non-creator views (audience), results are always revealed because
+  // the parent only renders PollResults when config.revealed is already true.
+  const [revealed, setRevealed] = useState(!isCreator || initialRevealed);
 
   async function fetchResults() {
     const res = await fetch(`/api/room/${roomCode}/vote?interactionId=${interactionId}`);
