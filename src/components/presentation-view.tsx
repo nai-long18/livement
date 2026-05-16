@@ -27,7 +27,7 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
       .then(setQrDataUrl);
   }, [roomCode]);
 
-  useSSE(roomCode, (event) => {
+  const { isConnected } = useSSE(roomCode, (event) => {
     if (event.type === 'interaction.update') {
       const data = event.data as { id: string; type: string; title: string; status: string };
       if (data.status === 'live') {
@@ -50,6 +50,11 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
 
   return (
     <main className="h-screen bg-slate-950 text-white flex flex-col overflow-hidden">
+      {!isConnected && (
+        <div className="bg-amber-500/90 text-black text-center text-sm py-1.5">
+          实时连接已断开，正在重连...
+        </div>
+      )}
       {/* Content Area */}
       <div className="flex-1 flex items-center justify-center p-8">
         <AnimatePresence mode="wait">

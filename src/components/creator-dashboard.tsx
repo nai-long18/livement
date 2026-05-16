@@ -36,8 +36,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
     fetchInteractions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Listen for SSE events specific to this room
-  useSSE(roomCode, (event) => {
+  const { isConnected } = useSSE(roomCode, (event) => {
     if (event.type === 'interaction.update' || event.type === 'vote.update' ||
         event.type === 'question.new' || event.type === 'wordcloud.update') {
       fetchInteractions();
@@ -58,6 +57,11 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
 
   return (
     <div className="h-screen flex flex-col">
+      {!isConnected && (
+        <div className="bg-amber-500/90 text-black text-center text-sm py-1.5">
+          实时连接已断开，正在重连...
+        </div>
+      )}
       <RoomHeader roomCode={roomCode} />
 
       <div className="flex-1 flex overflow-hidden">

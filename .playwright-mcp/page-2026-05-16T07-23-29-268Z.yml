@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e15]:
+      - heading "2025 最值得学的技术？" [level=2] [ref=e16]
+      - generic [ref=e42]:
+        - paragraph [ref=e43]: ✓ 已提交
+        - paragraph [ref=e44]: 等待创建者展示结果
+        - button "修改回答" [ref=e45]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

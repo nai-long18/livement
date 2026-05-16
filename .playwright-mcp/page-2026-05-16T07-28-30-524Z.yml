@@ -1,0 +1,10 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e58]:
+      - heading "用一个词形容你的 2025" [level=2] [ref=e59]
+      - generic [ref=e66]:
+        - textbox "输入一个词..." [ref=e67]
+        - button "提交" [disabled]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

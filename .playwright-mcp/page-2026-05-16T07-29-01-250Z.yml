@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e58]:
+      - heading "用一个词形容你的 2025" [level=2] [ref=e59]
+      - generic [ref=e68]:
+        - paragraph [ref=e69]: ✓ 已提交
+        - paragraph [ref=e70]: 等待创建者展示结果
+        - button "修改回答" [ref=e71]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

@@ -31,7 +31,19 @@
       "mcp__browser__browser_fill_form",
       "mcp__browser__browser_console_messages",
       "mcp__browser__browser_tabs",
-      "mcp__memory__add_observations"
+      "mcp__memory__add_observations",
+      "mcp__browser__browser_type",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "mcp__github__create_repository",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(ssh *)",
+      "Bash(curl -s http://174.138.18.249)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://174.138.18.249)",
+      "Bash(curl -s -X POST http://174.138.18.249/api/room -H 'Content-Type: application/json' -d '{\"title\":\"线上测试\"}')",
+      "Bash(python3 -m json.tool)"
     ]
   }
 }

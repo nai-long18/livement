@@ -1,0 +1,29 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - generic [ref=e23]:
+    - banner [ref=e24]:
+      - generic [ref=e25]:
+        - 'heading "房间: 8FHw" [level=2] [ref=e148]'
+        - button "复制" [ref=e149]
+      - button "进入演示" [ref=e150] [cursor=pointer]
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - button "＋ 添加互动" [ref=e151]
+        - generic [ref=e36]:
+          - generic [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]: 投票
+            - generic [ref=e70]: 2025 最值得学的技术？
+            - button "启动" [ref=e164]
+          - generic [ref=e120] [cursor=pointer]:
+            - generic [ref=e121]: 问答
+            - generic [ref=e122]: 有什么问题想问讲师？
+            - button "启动" [ref=e178]
+          - generic [ref=e154] [cursor=pointer]:
+            - generic [ref=e155]: 词云
+            - generic [ref=e156]: 用一个词形容你的 2025
+            - button "关闭" [active] [ref=e179]
+      - generic [ref=e38]:
+        - heading "用一个词形容你的 2025" [level=3] [ref=e175]
+        - paragraph [ref=e177]: 等待词云生成...

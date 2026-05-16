@@ -13,11 +13,27 @@ interface ActiveInteraction {
   id: string;
   type: 'poll' | 'qa' | 'wordcloud';
   title: string;
-  config: string; // JSON string, e.g. '{"options":["A","B"]}'
+  config: string;
+}
+
+type PageState = 'loading' | 'waiting' | 'active' | 'not-found';
+
+function SkeletonCard() {
+  return (
+    <Card className="p-6 space-y-4 animate-pulse">
+      <div className="h-7 bg-slate-800 rounded w-3/4 mx-auto" />
+      <div className="space-y-2">
+        <div className="h-14 bg-slate-800 rounded" />
+        <div className="h-14 bg-slate-800 rounded" />
+      </div>
+      <div className="h-10 bg-slate-800 rounded" />
+    </Card>
+  );
 }
 
 export function AudienceView({ roomCode }: { roomCode: string }) {
   const sessionId = useSessionId();
+  const [pageState, setPageState] = useState<PageState>('loading');
   const [interaction, setInteraction] = useState<ActiveInteraction | null>(null);
   const [selectedOption, setSelectedOption] = useState('');
   const [questionText, setQuestionText] = useState('');
@@ -29,25 +45,33 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
 
   useEffect(() => {
     fetch(`/api/room/${roomCode}/interaction`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) { setPageState('not-found'); return null; }
+        return r.json();
+      })
       .then(data => {
+        if (!data) return;
         const live = data.find((i: { status: string }) => i.status === 'live');
         if (live) {
           setInteraction(live);
-          // Parse poll options from config
+          setPageState('active');
           try {
             const config = JSON.parse(live.config);
             if (config.options) setPollOptions(config.options);
           } catch { setPollOptions([]); }
+        } else {
+          setPageState('waiting');
         }
-      });
+      })
+      .catch(() => setPageState('not-found'));
   }, [roomCode]);
 
-  useSSE(roomCode, (event) => {
+  const { isConnected } = useSSE(roomCode, (event) => {
     if (event.type === 'interaction.update') {
       const data = event.data as { id: string; type: string; title: string; config: string; status: string };
       if (data.status === 'live') {
         setInteraction(data as ActiveInteraction);
+        setPageState('active');
         setSubmitted(false);
         setResultPreview(null);
         try {
@@ -57,6 +81,7 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
         } catch { setPollOptions([]); }
       } else if (data.status === 'closed' && interaction?.id === data.id) {
         setInteraction(null);
+        setPageState('waiting');
         setSubmitted(false);
         setResultPreview(null);
       }
@@ -113,16 +138,59 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
     setSubmitted(true);
   }
 
-  if (!interaction) {
+  if (pageState === 'loading') {
     return (
-      <main className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <p className="text-slate-400 text-xl">等待互动开始...</p>
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <SkeletonCard />
+        </div>
       </main>
     );
   }
 
+  if (pageState === 'not-found') {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+        <Card className="p-6 text-center max-w-sm">
+          <p className="text-4xl mb-3">🔗</p>
+          <h2 className="text-lg font-semibold text-white mb-2">房间不存在或已关闭</h2>
+          <p className="text-slate-400 text-sm">请检查房间码是否正确，或联系创建者获取新的链接。</p>
+        </Card>
+      </main>
+    );
+  }
+
+  if (pageState === 'waiting') {
+    return (
+      <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+        <Card className="p-8 text-center max-w-sm">
+          <motion.div
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            <p className="text-3xl mb-3">⏳</p>
+          </motion.div>
+          <h2 className="text-lg font-semibold text-white mb-1">等待互动开始</h2>
+          <p className="text-slate-400 text-sm">创建者正在准备下一个互动环节。</p>
+          {!isConnected && (
+            <p className="text-amber-500 text-xs mt-3">与服务器连接中...</p>
+          )}
+        </Card>
+      </main>
+    );
+  }
+
+  if (!interaction) return null;
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-4">
+      {/* SSE Disconnect Banner */}
+      {!isConnected && (
+        <div className="fixed top-0 left-0 right-0 bg-amber-500/90 text-black text-center text-sm py-1.5 z-50">
+          连接已断开，正在重连...
+        </div>
+      )}
+
       <AnimatePresence mode="wait">
         <motion.div
           key={interaction.id}

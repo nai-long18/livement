@@ -1,0 +1,18 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e15]:
+      - heading "2025 最值得学的技术？" [level=2] [ref=e16]
+      - generic [ref=e31]:
+        - generic [ref=e32] [cursor=pointer]:
+          - radio "Rust" [ref=e33]
+          - generic [ref=e34]: Rust
+        - generic [ref=e35] [cursor=pointer]:
+          - radio "AI/LLM 应用开发" [checked] [ref=e36]
+          - generic [ref=e37]: AI/LLM 应用开发
+        - generic [ref=e38] [cursor=pointer]:
+          - radio "TypeScript" [ref=e39]
+          - generic [ref=e40]: TypeScript
+        - button "提交投票" [ref=e41]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

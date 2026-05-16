@@ -1,0 +1,35 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e18] [cursor=pointer]:
+    - img [ref=e19]
+  - alert [ref=e22]
+  - generic [ref=e23]:
+    - banner [ref=e24]:
+      - generic [ref=e25]:
+        - 'heading "房间: 8FHw" [level=2] [ref=e148]'
+        - button "复制" [ref=e149]
+      - button "进入演示" [ref=e150] [cursor=pointer]
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - button "＋ 添加互动" [ref=e151]
+        - generic [ref=e36]:
+          - generic [ref=e68] [cursor=pointer]:
+            - generic [ref=e69]: 投票
+            - generic [ref=e70]: 2025 最值得学的技术？
+            - button "启动" [ref=e164]
+          - generic [ref=e120] [cursor=pointer]:
+            - generic [ref=e121]: 问答
+            - generic [ref=e122]: 有什么问题想问讲师？
+            - button "关闭" [ref=e165]
+          - generic [ref=e154] [cursor=pointer]:
+            - generic [ref=e155]: 词云
+            - generic [ref=e156]: 用一个词形容你的 2025
+            - button "启动" [ref=e157]
+      - generic [ref=e38]:
+        - heading "有什么问题想问讲师？" [level=3] [ref=e161]
+        - generic [ref=e167]:
+          - button "▲ 1" [active] [ref=e174]:
+            - generic [ref=e169]: ▲
+            - generic [ref=e170]: "1"
+          - generic [ref=e171]:
+            - paragraph [ref=e172]: Next.js 和 Nuxt 该怎么选？
+            - paragraph [ref=e173]: — 小明

@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e47]:
+      - heading "有什么问题想问讲师？" [level=2] [ref=e48]
+      - generic [ref=e53]:
+        - paragraph [ref=e54]: ✓ 已提交
+        - paragraph [ref=e55]: 等待创建者展示结果
+        - button "再提一个问题" [ref=e56]
+  - button "Open Next.js Dev Tools" [ref=e9] [cursor=pointer]:
+    - img [ref=e10]
+  - alert [ref=e13]

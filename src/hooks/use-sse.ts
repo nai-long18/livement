@@ -1,7 +1,7 @@
 // src/hooks/use-sse.ts
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface SSEMessage {
   type: string;
@@ -11,36 +11,59 @@ interface SSEMessage {
 export function useSSE(
   roomCode: string,
   onEvent: (event: SSEMessage) => void
-) {
+): { isConnected: boolean } {
   const onEventRef = useRef(onEvent);
   onEventRef.current = onEvent;
+  const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
-    const eventSource = new EventSource(`/api/room/${roomCode}/stream`);
+    let eventSource: EventSource | null = null;
+    let reconnectTimeout: ReturnType<typeof setTimeout>;
+    let attempt = 0;
 
-    const handleMessage = (event: MessageEvent) => {
-      try {
-        const data = JSON.parse(event.data);
-        onEventRef.current({ type: event.type || 'message', data });
-      } catch {
-        // Ignore parse errors (e.g., ping comments)
-      }
-    };
+    function connect() {
+      eventSource = new EventSource(`/api/room/${roomCode}/stream`);
 
-    eventSource.addEventListener('ping', handleMessage);
-    eventSource.addEventListener('interaction.update', handleMessage);
-    eventSource.addEventListener('vote.update', handleMessage);
-    eventSource.addEventListener('question.new', handleMessage);
-    eventSource.addEventListener('question.upvote', handleMessage);
-    eventSource.addEventListener('wordcloud.update', handleMessage);
-    eventSource.addEventListener('room.close', handleMessage);
+      eventSource.onopen = () => {
+        setIsConnected(true);
+        attempt = 0;
+      };
 
-    eventSource.onerror = () => {
-      // EventSource will auto-reconnect
-    };
+      const handleMessage = (event: MessageEvent) => {
+        try {
+          const data = JSON.parse(event.data);
+          onEventRef.current({ type: event.type || 'message', data });
+        } catch {
+          // Ignore parse errors (e.g., ping comments)
+        }
+      };
+
+      eventSource.addEventListener('ping', handleMessage);
+      eventSource.addEventListener('interaction.update', handleMessage);
+      eventSource.addEventListener('vote.update', handleMessage);
+      eventSource.addEventListener('question.new', handleMessage);
+      eventSource.addEventListener('question.upvote', handleMessage);
+      eventSource.addEventListener('wordcloud.update', handleMessage);
+      eventSource.addEventListener('room.close', handleMessage);
+
+      eventSource.onerror = () => {
+        setIsConnected(false);
+        eventSource?.close();
+
+        // Exponential backoff with jitter to avoid thundering herd
+        const delay = Math.min(1000 * Math.pow(2, attempt), 30000) + (Math.random() * 1000);
+        attempt++;
+        reconnectTimeout = setTimeout(connect, delay);
+      };
+    }
+
+    connect();
 
     return () => {
-      eventSource.close();
+      clearTimeout(reconnectTimeout);
+      eventSource?.close();
     };
   }, [roomCode]);
+
+  return { isConnected };
 }
