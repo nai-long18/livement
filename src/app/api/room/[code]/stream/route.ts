@@ -6,10 +6,12 @@ import { getRoom } from '@/lib/room';
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   const { code } = await params;
+  const { searchParams } = new URL(request.url);
+  const role = (searchParams.get('role') || 'audience') as 'creator' | 'audience';
 
   const room = getRoom(code);
   if (!room) {
@@ -22,7 +24,7 @@ export async function GET(
       send({ type: 'ping', data: { time: Date.now() } });
     }, 15000);
 
-    const unsubscribe = subscribeToRoom(code, (event) => {
+    const unsubscribe = subscribeToRoom(code, role, (event) => {
       send(event);
     });
 

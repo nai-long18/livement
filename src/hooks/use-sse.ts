@@ -10,7 +10,8 @@ interface SSEMessage {
 
 export function useSSE(
   roomCode: string,
-  onEvent: (event: SSEMessage) => void
+  onEvent: (event: SSEMessage) => void,
+  role: 'creator' | 'audience' = 'audience'
 ): { isConnected: boolean } {
   const onEventRef = useRef(onEvent);
   onEventRef.current = onEvent;
@@ -22,7 +23,7 @@ export function useSSE(
     let attempt = 0;
 
     function connect() {
-      eventSource = new EventSource(`/api/room/${roomCode}/stream`);
+      eventSource = new EventSource(`/api/room/${roomCode}/stream?role=${role}`);
 
       eventSource.onopen = () => {
         setIsConnected(true);
@@ -39,6 +40,7 @@ export function useSSE(
       };
 
       eventSource.addEventListener('ping', handleMessage);
+      eventSource.addEventListener('participants.update', handleMessage);
       eventSource.addEventListener('interaction.update', handleMessage);
       eventSource.addEventListener('vote.update', handleMessage);
       eventSource.addEventListener('question.new', handleMessage);
@@ -63,7 +65,7 @@ export function useSSE(
       clearTimeout(reconnectTimeout);
       eventSource?.close();
     };
-  }, [roomCode]);
+  }, [roomCode, role]);
 
   return { isConnected };
 }
