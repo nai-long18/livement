@@ -1,0 +1,141 @@
+- generic [ref=e3]:
+  - generic:
+    - generic [ref=e6]:
+      - link "新闻" [ref=e7] [cursor=pointer]:
+        - /url: http://news.baidu.com
+      - link "hao123" [ref=e8] [cursor=pointer]:
+        - /url: https://www.hao123.com?src=from_pc
+      - link "地图" [ref=e9] [cursor=pointer]:
+        - /url: http://map.baidu.com
+      - link "贴吧" [ref=e10] [cursor=pointer]:
+        - /url: http://tieba.baidu.com/
+      - link "视频" [ref=e11] [cursor=pointer]:
+        - /url: https://haokan.baidu.com/?sfrom=baidu-top
+      - link "图片" [ref=e12] [cursor=pointer]:
+        - /url: http://image.baidu.com/
+      - link "网盘" [ref=e13] [cursor=pointer]:
+        - /url: https://pan.baidu.com?from=1026962h
+      - link "文库" [ref=e14] [cursor=pointer]:
+        - /url: https://wenku.baidu.com/?fr=bdpcindex
+      - link "文心" [ref=e15] [cursor=pointer]:
+        - /url: https://chat.baidu.com/search?isShowHello=1&pd=csaitab&setype=csaitab&extParamsJson=%7B%22enter_type%22%3A%22home_tab%22%7D
+      - link "搭子DuMate" [ref=e16] [cursor=pointer]:
+        - /url: https://dumate.cn?track=bdsy
+      - link "更多" [ref=e18] [cursor=pointer]:
+        - /url: http://www.baidu.com/more/
+    - generic [ref=e19]:
+      - generic [ref=e20] [cursor=pointer]: 设置
+      - link "登录" [ref=e21] [cursor=pointer]:
+        - /url: https://passport.baidu.com/v2/?login&tpl=mn&u=http%3A%2F%2Fwww.baidu.com%2F&sms=5
+  - generic [ref=e24]:
+    - generic [ref=e25]:
+      - img [ref=e26]
+      - generic:
+        - link "点击一下，了解更多":
+          - /url: //www.baidu.com/s?wd=%E7%99%BE%E5%BA%A6%E7%83%AD%E6%90%9C&sa=ire_dl_gh_logo_texing&rsv_dl=igh_logo_pcs
+    - generic [ref=e31]:
+      - generic [ref=e34]:
+        - textbox "1车卤味摆好孩子误触全翻车" [active] [ref=e36]
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - img [ref=e47] [cursor=pointer]
+            - generic [ref=e50]:
+              - img [ref=e54] [cursor=pointer]
+              - img [ref=e59] [cursor=pointer]
+          - button "百度一下" [ref=e63] [cursor=pointer]
+      - link "复杂问题就找文心助手，深入思考回答更优 " [ref=e67] [cursor=pointer]:
+        - /url: https://chat.baidu.com/search?extParams=%7B%22enter_type%22%3A%22home_operate%22%7D&isShowHello=1
+        - img [ref=e68]
+        - generic [ref=e69]:
+          - generic [ref=e70]: 复杂问题就找文心助手，深入思考回答更优
+          - generic [ref=e71]: 
+    - generic [ref=e72]:
+      - generic [ref=e73]:
+        - link "百度热搜":
+          - /url: https://top.baidu.com/board?platform=pc&sa=pcindex_entry
+          - generic "百度热搜" [ref=e74] [cursor=pointer]: 
+        - generic [ref=e75] [cursor=pointer]:
+          - generic [ref=e76]: 
+          - text: 换一换
+      - list:
+        - listitem [ref=e77]:
+          - link " 中国加快推进新型基础设施建设" [ref=e78] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E5%8A%A0%E5%BF%AB%E6%8E%A8%E8%BF%9B%E6%96%B0%E5%9E%8B%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%E5%BB%BA%E8%AE%BE&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e79]: 
+            - text: 中国加快推进新型基础设施建设
+        - listitem [ref=e81]:
+          - link "5 韩男子入狱前重仓股票 6年后翻402倍" [ref=e82] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E9%9F%A9%E7%94%B7%E5%AD%90%E5%85%A5%E7%8B%B1%E5%89%8D%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8+6%E5%B9%B4%E5%90%8E%E7%BF%BB402%E5%80%8D&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e83]: "5"
+            - text: 韩男子入狱前重仓股票 6年后翻402倍
+          - generic [ref=e84]: 新
+        - listitem [ref=e85]:
+          - link "1 外交部介绍特朗普访华安排和中方期待" [ref=e86] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E5%A4%96%E4%BA%A4%E9%83%A8%E4%BB%8B%E7%BB%8D%E7%89%B9%E6%9C%97%E6%99%AE%E8%AE%BF%E5%8D%8E%E5%AE%89%E6%8E%92%E5%92%8C%E4%B8%AD%E6%96%B9%E6%9C%9F%E5%BE%85&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e87]: "1"
+            - text: 外交部介绍特朗普访华安排和中方期待
+          - generic [ref=e88]: 热
+        - listitem [ref=e89]:
+          - link "6 奶茶店因饮品名为暴打渣男被罚" [ref=e90] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E5%A5%B6%E8%8C%B6%E5%BA%97%E5%9B%A0%E9%A5%AE%E5%93%81%E5%90%8D%E4%B8%BA%E6%9A%B4%E6%89%93%E6%B8%A3%E7%94%B7%E8%A2%AB%E7%BD%9A&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e91]: "6"
+            - text: 奶茶店因饮品名为暴打渣男被罚
+          - generic [ref=e92]: 热
+        - listitem [ref=e93]:
+          - link "2 幼儿园用依云矿泉水蒸饭 学费5980元" [ref=e94] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E5%B9%BC%E5%84%BF%E5%9B%AD%E7%94%A8%E4%BE%9D%E4%BA%91%E7%9F%BF%E6%B3%89%E6%B0%B4%E8%92%B8%E9%A5%AD+%E5%AD%A6%E8%B4%B95980%E5%85%83&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e95]: "2"
+            - text: 幼儿园用依云矿泉水蒸饭 学费5980元
+          - generic [ref=e96]: 新
+        - listitem [ref=e97]:
+          - link "7 人民日报：豆包试水收费值不值" [ref=e98] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E4%BA%BA%E6%B0%91%E6%97%A5%E6%8A%A5%EF%BC%9A%E8%B1%86%E5%8C%85%E8%AF%95%E6%B0%B4%E6%94%B6%E8%B4%B9%E5%80%BC%E4%B8%8D%E5%80%BC&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e99]: "7"
+            - text: 人民日报：豆包试水收费值不值
+        - listitem [ref=e101]:
+          - link "3 扩内需如何才能更有效" [ref=e102] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E6%89%A9%E5%86%85%E9%9C%80%E5%A6%82%E4%BD%95%E6%89%8D%E8%83%BD%E6%9B%B4%E6%9C%89%E6%95%88&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e103]: "3"
+            - text: 扩内需如何才能更有效
+        - listitem [ref=e105]:
+          - link "8 微信转账能组合支付了" [ref=e106] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E5%BE%AE%E4%BF%A1%E8%BD%AC%E8%B4%A6%E8%83%BD%E7%BB%84%E5%90%88%E6%94%AF%E4%BB%98%E4%BA%86&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e107]: "8"
+            - text: 微信转账能组合支付了
+          - generic [ref=e108]: 热
+        - listitem [ref=e109]:
+          - link "4 中国未来要发射20万颗卫星" [ref=e110] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E4%B8%AD%E5%9B%BD%E6%9C%AA%E6%9D%A5%E8%A6%81%E5%8F%91%E5%B0%8420%E4%B8%87%E9%A2%97%E5%8D%AB%E6%98%9F&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e111]: "4"
+            - text: 中国未来要发射20万颗卫星
+          - generic [ref=e112]: 新
+        - listitem [ref=e113]:
+          - link "9 母牛被买走宰杀 公牛追车两里路" [ref=e114] [cursor=pointer]:
+            - /url: https://www.baidu.com/s?wd=%E6%AF%8D%E7%89%9B%E8%A2%AB%E4%B9%B0%E8%B5%B0%E5%AE%B0%E6%9D%80+%E5%85%AC%E7%89%9B%E8%BF%BD%E8%BD%A6%E4%B8%A4%E9%87%8C%E8%B7%AF&sa=fyb_n_homepage&rsv_dl=fyb_n_homepage&from=super&cl=3&tn=baidutop10&fr=top1000&rsv_idx=2&hisfilter=1
+            - generic [ref=e115]: "9"
+            - text: 母牛被买走宰杀 公牛追车两里路
+  - generic [ref=e118]:
+    - paragraph [ref=e119]:
+      - link "关于百度" [ref=e120] [cursor=pointer]:
+        - /url: //home.baidu.com
+    - paragraph [ref=e121]:
+      - link "About Baidu" [ref=e122] [cursor=pointer]:
+        - /url: http://ir.baidu.com
+    - paragraph [ref=e123]:
+      - link "使用百度前必读" [ref=e124] [cursor=pointer]:
+        - /url: //www.baidu.com/duty
+    - paragraph [ref=e125]:
+      - link "帮助中心" [ref=e126] [cursor=pointer]:
+        - /url: https://help.baidu.com/question?prod_id=1
+    - paragraph [ref=e127]:
+      - link "企业推广" [ref=e128] [cursor=pointer]:
+        - /url: https://e.baidu.com/?refer=1271
+    - paragraph [ref=e129]:
+      - link "京公网安备11000002000001号" [ref=e130] [cursor=pointer]:
+        - /url: http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=11000002000001
+    - paragraph [ref=e131]:
+      - link "京ICP证030173号" [ref=e132] [cursor=pointer]:
+        - /url: https://beian.miit.gov.cn
+    - paragraph [ref=e133]: 互联网新闻信息服务许可证11220180008
+    - generic [ref=e134]: 
+    - generic [ref=e135]: 

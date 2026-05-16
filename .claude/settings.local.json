@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "mcp__browser__browser_navigate",
+      "mcp__browser__browser_take_screenshot",
+      "Bash(git -C \"C:/Users/ljh/OneDrive/Desktop/Claude_test\" log --oneline -5)",
+      "mcp__memory__create_entities",
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(npx create-next-app@latest _tmp --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(npx create-next-app@latest tmp-livement --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(cp -r tmp-livement/public .)",
+      "Bash(cp -r tmp-livement/src .)",
+      "Bash(cp -r tmp-livement/node_modules .)"
+    ]
+  }
+}
