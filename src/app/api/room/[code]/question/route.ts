@@ -9,22 +9,28 @@ import {
   updateQuestionStatus,
 } from '@/lib/interaction';
 import { publishToRoom } from '@/lib/sse';
+import { getOrCreateSessionId } from '@/lib/session';
+import { rateLimitByIp } from '@/lib/rate-limit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const rl = rateLimitByIp(request, 20, 60_000);
+  if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+
   const { code } = await params;
   const room = getRoom(code);
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const body = await request.json();
-  const { interactionId, content, askerId, askerName } = body as {
+  const { interactionId, content, askerName } = body as {
     interactionId: string;
     content: string;
-    askerId: string;
     askerName?: string;
   };
+  // Use server-side session as askerId, ignore client-supplied value
+  const askerId = await getOrCreateSessionId();
 
   const interaction = getInteraction(interactionId);
   if (!interaction || interaction.room_id !== code) {
@@ -46,6 +52,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const rl = rateLimitByIp(request, 30, 60_000);
+  if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+
   const { code } = await params;
   const room = getRoom(code);
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
@@ -64,8 +73,13 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   }
 
-  // Status update mode (new)
+  // Status update mode (creator only — validate session)
   if (questionId && (answered !== undefined || pinned !== undefined)) {
+    const creatorSid = await getOrCreateSessionId();
+    if (room.creator_sid && room.creator_sid !== creatorSid) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
     const question = db.prepare(`
       SELECT q.* FROM question q
       JOIN interaction i ON i.id = q.interaction_id

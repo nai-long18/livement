@@ -10,21 +10,27 @@ import {
   getRatingResults,
 } from '@/lib/interaction';
 import { publishToRoom } from '@/lib/sse';
+import { getOrCreateSessionId } from '@/lib/session';
+import { rateLimitByIp } from '@/lib/rate-limit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
+  const rl = rateLimitByIp(request, 30, 60_000);
+  if (!rl.success) return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+
   const { code } = await params;
   const room = getRoom(code);
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const body = await request.json();
-  const { interactionId, optionText, voterId } = body as {
+  const { interactionId, optionText } = body as {
     interactionId: string;
     optionText: string;
-    voterId: string;
   };
+  // Use server-side session as voterId, ignore client-supplied value
+  const voterId = await getOrCreateSessionId();
 
   const interaction = getInteraction(interactionId);
   if (!interaction || interaction.room_id !== code) {

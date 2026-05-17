@@ -6,16 +6,22 @@ import { getVoteResults, getQuestions, getWordCloudData, getInteraction } from '
 // BOM for Excel UTF-8 compatibility
 const BOM = '﻿';
 
+function sanitizeCell(cell: string): string {
+  // Prevent CSV formula injection: prefix cells starting with =, +, -, @ with a tab
+  if (/^[=+\-@]/.test(cell)) {
+    cell = '\t' + cell;
+  }
+  // Escape cells containing comma, quote, or newline
+  if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
+    return `"${cell.replace(/"/g, '""')}"`;
+  }
+  return cell;
+}
+
 function formatCsv(headers: string[], rows: string[][]): string {
   const lines = [headers.join(',')];
   for (const row of rows) {
-    lines.push(row.map(cell => {
-      // Escape cells containing comma or quote
-      if (cell.includes(',') || cell.includes('"') || cell.includes('\n')) {
-        return `"${cell.replace(/"/g, '""')}"`;
-      }
-      return cell;
-    }).join(','));
+    lines.push(row.map(sanitizeCell).join(','));
   }
   return BOM + lines.join('\n');
 }

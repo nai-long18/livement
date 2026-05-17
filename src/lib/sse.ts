@@ -9,9 +9,10 @@ export function createSSEStream(
   onSubscribe: (
     send: (event: SSEMessage) => void,
     close: () => void
-  ) => void
+  ) => () => void
 ): ReadableStream {
-  let encoder = new TextEncoder();
+  const encoder = new TextEncoder();
+  let cleanup: (() => void) | null = null;
 
   return new ReadableStream({
     start(controller) {
@@ -24,13 +25,15 @@ export function createSSEStream(
         controller.close();
       };
 
-      // Send initial connection event
       controller.enqueue(encoder.encode(':ok\n\n'));
 
-      onSubscribe(send, close);
+      cleanup = onSubscribe(send, close);
     },
     cancel() {
-      // Cleanup handled by onSubscribe's close callback
+      if (cleanup) {
+        cleanup();
+        cleanup = null;
+      }
     },
   });
 }

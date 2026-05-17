@@ -60,6 +60,7 @@ export function initializeDatabase(): void {
   // Migrations — safe to run repeatedly
   try { db.exec('ALTER TABLE question ADD COLUMN answered INTEGER NOT NULL DEFAULT 0'); } catch {}
   try { db.exec('ALTER TABLE question ADD COLUMN pinned INTEGER NOT NULL DEFAULT 0'); } catch {}
+  try { db.exec('ALTER TABLE room ADD COLUMN creator_sid TEXT NOT NULL DEFAULT \'\''); } catch {}
 }
 
 export default db;

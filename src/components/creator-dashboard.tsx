@@ -154,7 +154,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
                   </Button>
                   {showExport && (
                     <div className="absolute right-0 top-full mt-1 bg-card border rounded-lg shadow-lg z-50 py-1 min-w-[140px]">
-                      {interactions.filter(i => i.type === 'poll' || i.type === 'qa' || i.type === 'wordcloud').map(i => (
+                      {interactions.filter(i => i.type === 'poll' || i.type === 'qa' || i.type === 'wordcloud' || i.type === 'rating' || i.type === 'leaderboard').map(i => (
                         <a
                           key={i.id}
                           href={`/api/room/${roomCode}/export?type=${i.type}&interactionId=${i.id}`}

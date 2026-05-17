@@ -9,7 +9,8 @@ vi.mock('../db', () => {
     CREATE TABLE IF NOT EXISTS room (
       id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed'))
+      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed')),
+      creator_sid TEXT NOT NULL DEFAULT ''
     );
     CREATE TABLE IF NOT EXISTS interaction (
       id TEXT PRIMARY KEY, room_id TEXT NOT NULL REFERENCES room(id) ON DELETE CASCADE,
@@ -100,7 +101,7 @@ describe('interaction', () => {
     submitQuestion(i.id, '什么是 SSR？', 'u1', '小明');
     const qs = getQuestions(i.id);
     expect(qs).toHaveLength(1);
-    expect(qs[0].content).toBe('什么是 SSR？');
+    expect((qs[0] as { content: string }).content).toBe('什么是 SSR？');
   });
 
   it('upvoteQuestion increments', () => {

@@ -129,7 +129,6 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
         body: JSON.stringify({
           interactionId: interaction.id,
           optionText: opt,
-          voterId: sessionId,
         }),
       });
     }
@@ -145,7 +144,6 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
       body: JSON.stringify({
         interactionId: interaction.id,
         content: questionText.trim(),
-        askerId: sessionId,
         askerName: askerName.trim(),
       }),
     });
@@ -162,7 +160,6 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
       body: JSON.stringify({
         interactionId: interaction.id,
         optionText: wordInput.trim(),
-        voterId: sessionId,
       }),
     });
     const data = await res.json();
@@ -181,7 +178,6 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
       body: JSON.stringify({
         interactionId: interaction.id,
         optionText: ratingValue,
-        voterId: sessionId,
       }),
     });
     setSubmitted(true);
@@ -197,7 +193,6 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
       body: JSON.stringify({
         interactionId: interaction.id,
         optionTexts: leaderboardOptions,
-        voterId: sessionId,
       }),
     });
     setResultPreview({ total: leaderboardOptions.length });

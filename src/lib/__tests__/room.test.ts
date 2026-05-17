@@ -10,7 +10,8 @@ vi.mock('../db', () => {
     CREATE TABLE IF NOT EXISTS room (
       id TEXT PRIMARY KEY, title TEXT NOT NULL DEFAULT '',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed'))
+      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'closed')),
+      creator_sid TEXT NOT NULL DEFAULT ''
     );
     CREATE TABLE IF NOT EXISTS interaction (
       id TEXT PRIMARY KEY, room_id TEXT NOT NULL REFERENCES room(id) ON DELETE CASCADE,
