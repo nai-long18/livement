@@ -6,6 +6,8 @@ import {
   getVoteResults,
   submitWord,
   getWordCloudData,
+  submitMultiVote,
+  getRatingResults,
 } from '@/lib/interaction';
 import { publishToRoom } from '@/lib/sse';
 
@@ -40,6 +42,24 @@ export async function POST(
     return NextResponse.json({ success: true, data });
   }
 
+  if (interaction.type === 'rating') {
+    submitVote(interactionId, optionText, voterId);
+    const results = getRatingResults(interactionId);
+    publishToRoom(code, { type: 'vote.update', data: results });
+    return NextResponse.json({ success: true, ...results });
+  }
+
+  if (interaction.type === 'leaderboard') {
+    const { optionTexts } = body as { optionTexts?: string[] };
+    if (!optionTexts || optionTexts.length === 0) {
+      return NextResponse.json({ error: 'optionTexts required' }, { status: 400 });
+    }
+    submitMultiVote(interactionId, optionTexts, voterId);
+    const voteResults = getVoteResults(interactionId);
+    publishToRoom(code, { type: 'vote.update', data: voteResults });
+    return NextResponse.json({ success: true, ...voteResults });
+  }
+
   // Poll
   const result = submitVote(interactionId, optionText, voterId);
   if (!result.success) return NextResponse.json(result, { status: 409 });
@@ -68,6 +88,11 @@ export async function GET(
   if (interaction.type === 'wordcloud') {
     const data = getWordCloudData(interactionId);
     return NextResponse.json(data);
+  }
+
+  if (interaction.type === 'rating') {
+    const results = getRatingResults(interactionId);
+    return NextResponse.json(results);
   }
 
   const results = getVoteResults(interactionId);

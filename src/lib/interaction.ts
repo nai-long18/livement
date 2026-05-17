@@ -120,6 +120,56 @@ export function getVoteResults(interactionId: string): { total: number; options:
   return { total, options };
 }
 
+export interface RatingResult {
+  type: 'rating';
+  average: number;
+  distribution: Record<string, number>;
+  total: number;
+  npsScore: number | null;
+}
+
+export function getRatingResults(interactionId: string): RatingResult {
+  const interaction = getInteraction(interactionId);
+  if (!interaction) return { type: 'rating', average: 0, distribution: {}, total: 0, npsScore: null };
+
+  const config = JSON.parse(interaction.config);
+  const min = config.min ?? 1;
+  const max = config.max ?? 5;
+
+  // Initialize distribution with all zeros
+  const distribution: Record<string, number> = {};
+  for (let v = min; v <= max; v++) {
+    distribution[String(v)] = 0;
+  }
+
+  const rows = db.prepare(
+    'SELECT option_text, COUNT(*) as count FROM vote WHERE interaction_id = ? GROUP BY option_text'
+  ).all(interactionId) as { option_text: string; count: number }[];
+
+  let sum = 0;
+  let total = 0;
+  for (const row of rows) {
+    distribution[row.option_text] = row.count;
+    sum += Number(row.option_text) * row.count;
+    total += row.count;
+  }
+
+  const average = total > 0 ? sum / total : 0;
+
+  let npsScore: number | null = null;
+  if (config.ratingType === 'nps' && total > 0) {
+    const promoters = rows
+      .filter(r => Number(r.option_text) >= 9)
+      .reduce((s, r) => s + r.count, 0);
+    const detractors = rows
+      .filter(r => Number(r.option_text) <= 6)
+      .reduce((s, r) => s + r.count, 0);
+    npsScore = Math.round(((promoters - detractors) / total) * 100);
+  }
+
+  return { type: 'rating', average: Math.round(average * 10) / 10, distribution, total, npsScore };
+}
+
 export function submitMultiVote(
   interactionId: string,
   optionTexts: string[],

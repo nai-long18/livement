@@ -41,7 +41,7 @@ import {
   createInteraction, getRoomInteractions, updateInteractionStatus,
   getInteraction, submitVote, getVoteResults,
   submitQuestion, getQuestions, upvoteQuestion,
-  submitWord, getWordCloudData, submitMultiVote,
+  submitWord, getWordCloudData, submitMultiVote, getRatingResults,
 } from '../interaction';
 
 const ROOM = 'R001';
@@ -175,5 +175,47 @@ describe('interaction', () => {
     expect(results.total).toBe(2); // still 2, not 4
     expect(results.options.find((o: { option_text: string }) => o.option_text === 'B')!.count).toBe(1);
     expect(results.options.find((o: { option_text: string }) => o.option_text === 'C')!.count).toBe(1);
+  });
+
+  it('getRatingResults returns average, distribution, and total', () => {
+    const i = createInteraction(ROOM, 'rating', '星级评分', {
+      ratingType: 'star', min: 1, max: 5,
+    });
+    updateInteractionStatus(i.id, 'live');
+
+    submitVote(i.id, '5', 'u1');
+    submitVote(i.id, '4', 'u2');
+    submitVote(i.id, '4', 'u3');
+    submitVote(i.id, '3', 'u4');
+
+    const r = getRatingResults(i.id);
+    expect(r.type).toBe('rating');
+    expect(r.total).toBe(4);
+    expect(r.average).toBeCloseTo(4.0, 1);
+    expect(r.distribution).toEqual({ '1': 0, '2': 0, '3': 1, '4': 2, '5': 1 });
+  });
+
+  it('getRatingResults calculates NPS score correctly', () => {
+    const i = createInteraction(ROOM, 'rating', 'NPS', {
+      ratingType: 'nps', min: 0, max: 10,
+    });
+    updateInteractionStatus(i.id, 'live');
+
+    // 3 promoters (9-10), 4 passives (7-8), 3 detractors (0-6) = 10 total
+    submitVote(i.id, '10', 'u1');
+    submitVote(i.id, '9', 'u2');
+    submitVote(i.id, '9', 'u3');
+    submitVote(i.id, '8', 'u4');
+    submitVote(i.id, '7', 'u5');
+    submitVote(i.id, '7', 'u6');
+    submitVote(i.id, '7', 'u7');
+    submitVote(i.id, '5', 'u8');
+    submitVote(i.id, '3', 'u9');
+    submitVote(i.id, '0', 'u10');
+    const r = getRatingResults(i.id);
+    expect(r.total).toBe(10);
+    expect(r.npsScore).toBe(0); // (3 - 3) / 10 * 100 = 0
+    expect(r.distribution['10']).toBe(1);
+    expect(r.distribution['0']).toBe(1);
   });
 });
