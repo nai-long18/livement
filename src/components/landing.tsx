@@ -175,9 +175,9 @@ export function LandingPage() {
             animate={{ opacity: 1 }}
             className="w-full max-w-md px-4 text-center z-10"
           >
-            {/* Greeting */}
+            {/* Greeting — cold blue-gray, lighter for small-text legibility */}
             <motion.p
-              className="text-blue-200/50 text-sm font-light tracking-wide mb-6"
+              className="text-[#8b95a5] text-sm font-light tracking-wide mb-8"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -185,14 +185,15 @@ export function LandingPage() {
               {greeting}今天想和谁连线？
             </motion.p>
 
-            <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">LiveMent</h1>
-            <p className="text-blue-200/40 text-sm font-light mb-12">实时互动，三秒开始</p>
+            {/* Title group — close proximity */}
+            <h1 className="text-5xl font-bold text-white mb-2 tracking-tight">LiveMent</h1>
+            <p className="text-white/50 text-sm font-light mb-14">实时互动，三秒开始</p>
 
-            {/* CTA — refined jewel-like button */}
+            {/* CTA — sapphire jewel button */}
             <motion.div
               whileHover={{ scale: 1.015 }}
               whileTap={{ scale: 0.985 }}
-              className="mb-5"
+              className="mb-6"
             >
               <motion.button
                 type="button"
@@ -200,46 +201,51 @@ export function LandingPage() {
                 onClick={handleCreate}
                 className="relative w-full py-4 rounded-2xl text-lg font-semibold text-white overflow-hidden disabled:opacity-50 group"
                 style={{
-                  background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)',
+                  background: 'linear-gradient(180deg, #1d4ed8 0%, #1e3a5f 100%)',
                   boxShadow: [
-                    '0 2px 4px rgba(0,0,0,0.3)',
-                    '0 6px 20px -4px rgba(37,99,235,0.4)',
-                    '0 12px 40px -8px rgba(37,99,235,0.25)',
-                    'inset 0 1px 0 rgba(255,255,255,0.15)',
+                    '0 1px 2px rgba(0,0,0,0.4)',
+                    '0 4px 8px -2px rgba(0,0,0,0.3)',
+                    '0 16px 48px -12px rgba(30,64,175,0.25)',
+                    'inset 0 1px 0 rgba(255,255,255,0.22)',
                   ].join(', '),
                 }}
               >
-                {/* Inner top highlight — glass feel */}
-                <div className="absolute inset-0 rounded-2xl pointer-events-none"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 40%)' }}
+                {/* Glass cut edge — top white rim */}
+                <div className="absolute inset-x-0 top-0 h-px rounded-2xl pointer-events-none"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, transparent 100%)' }}
                 />
-                {/* Subtle center glow on hover */}
-                <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                  style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)' }}
+                {/* Hover surface sheen */}
+                <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+                  style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.06) 0%, transparent 50%)' }}
                 />
                 <span className="relative z-10">{creating ? '创建中...' : '＋ 创建新房间'}</span>
               </motion.button>
             </motion.div>
 
+            {/* Divider — barely visible */}
             <div className="flex items-center gap-3 mb-5">
-              <div className="flex-1 h-px bg-white/[0.06]" />
-              <span className="text-slate-500 text-xs font-light tracking-wider">或</span>
-              <div className="flex-1 h-px bg-white/[0.06]" />
+              <div className="flex-1 h-px"
+                style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, transparent 100%)' }}
+              />
+              <span className="text-white/20 text-[11px] font-light tracking-[0.2em]">或</span>
+              <div className="flex-1 h-px"
+                style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.05) 70%, transparent 100%)' }}
+              />
             </div>
 
-            {/* Join form — glassmorphism */}
+            {/* Join form — subtle surface elevation */}
             <form onSubmit={handleJoin} className="flex gap-2.5 mb-3">
               <div className="relative flex-1">
                 <Input
                   value={joinCode}
                   onChange={e => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="输入房间码"
-                  className="text-center text-lg tracking-widest uppercase font-mono border-white/[0.08] bg-white/[0.03] backdrop-blur-sm text-white placeholder:text-slate-500 rounded-xl h-11"
+                  className="text-center text-lg tracking-widest uppercase font-mono border border-white/[0.08] bg-white/[0.04] backdrop-blur-sm text-white placeholder:text-white/25 rounded-xl h-11"
                   maxLength={6}
                 />
                 <button
                   type="button"
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-blue-300 transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-white/25 hover:text-blue-300 transition-colors"
                   title="粘贴"
                   onClick={async () => {
                     try {
@@ -248,7 +254,7 @@ export function LandingPage() {
                     } catch { /* clipboard unavailable */ }
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                   </svg>
                 </button>
@@ -258,13 +264,13 @@ export function LandingPage() {
                 disabled={!joinCode.trim()}
                 animate={{
                   background: joinCode.trim()
-                    ? 'linear-gradient(180deg, #3b82f6, #2563eb)'
-                    : 'linear-gradient(180deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8))',
-                  color: joinCode.trim() ? '#fff' : '#64748b',
+                    ? 'linear-gradient(180deg, #1d4ed8, #1e3a5f)'
+                    : 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02))',
+                  color: joinCode.trim() ? '#fff' : '#475569',
                   boxShadow: joinCode.trim()
-                    ? '0 0 20px -4px rgba(59,130,246,0.35)'
-                    : 'inset 0 1px 0 rgba(255,255,255,0.03)',
-                  borderColor: joinCode.trim() ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.06)',
+                    ? '0 0 32px -8px rgba(37,99,235,0.25), inset 0 1px 0 rgba(255,255,255,0.15)'
+                    : 'inset 0 1px 0 rgba(255,255,255,0.04)',
+                  borderColor: joinCode.trim() ? 'rgba(59,130,246,0.2)' : 'rgba(255,255,255,0.06)',
                 }}
                 transition={{ duration: 0.3 }}
                 className="px-5 py-2 rounded-xl text-sm font-semibold disabled:cursor-not-allowed border"
@@ -288,7 +294,7 @@ export function LandingPage() {
               )}
             </AnimatePresence>
 
-            {/* Recent rooms — glass pill tags */}
+            {/* Recent rooms */}
             <AnimatePresence>
               {recentRooms.length > 0 && (
                 <motion.div
@@ -297,11 +303,11 @@ export function LandingPage() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <span className="text-xs text-slate-500 font-light">最近：</span>
+                  <span className="text-xs text-white/30 font-light">最近：</span>
                   {recentRooms.slice(0, 3).map(room => (
                     <motion.button
                       key={room.code}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/[0.04] backdrop-blur-sm text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06] transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/[0.04] backdrop-blur-sm text-white/50 hover:bg-white/[0.08] hover:text-white/80 border border-white/[0.06] transition-colors cursor-pointer"
                       onClick={() => handleRecentClick(room)}
                       whileHover={{ scale: 1.04 }}
                       whileTap={{ scale: 0.96 }}
