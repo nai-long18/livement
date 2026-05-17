@@ -26,7 +26,7 @@ export function initializeDatabase(): void {
     CREATE TABLE IF NOT EXISTS interaction (
       id         TEXT PRIMARY KEY,
       room_id    TEXT NOT NULL REFERENCES room(id) ON DELETE CASCADE,
-      type       TEXT NOT NULL CHECK(type IN ('poll', 'qa', 'wordcloud')),
+      type       TEXT NOT NULL CHECK(type IN ('poll', 'qa', 'wordcloud', 'rating', 'leaderboard')),
       title      TEXT NOT NULL DEFAULT '',
       config     TEXT NOT NULL DEFAULT '{}',
       status     TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'live', 'closed')),
