@@ -29,7 +29,7 @@ export async function GET(
   if (!room) return NextResponse.json({ error: 'Room not found' }, { status: 404 });
 
   const { searchParams } = new URL(request.url);
-  const type = searchParams.get('type') as 'poll' | 'qa' | 'wordcloud';
+  const type = searchParams.get('type') as 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
   const interactionId = searchParams.get('interactionId');
 
   if (!type || !interactionId) {
@@ -45,6 +45,33 @@ export async function GET(
         const pct = results.total > 0 ? Math.round((o.count / results.total) * 100) + '%' : '0%';
         return [o.option_text, String(o.count), pct];
       }));
+      break;
+    }
+    case 'rating': {
+      const { getRatingResults } = await import('@/lib/interaction');
+      const results = getRatingResults(interactionId);
+      const rows = Object.entries(results.distribution)
+        .sort(([a], [b]) => Number(b) - Number(a));
+      csv = formatCsv(['评分', '人数', '占比'], rows.map(([score, count]) => {
+        const pct = results.total > 0 ? Math.round((count / results.total) * 100) + '%' : '0%';
+        return [score, String(count), pct];
+      }));
+      // Append summary row for NPS
+      if (results.npsScore !== null) {
+        csv += '\nNPS 分数,' + results.npsScore;
+      }
+      csv += '\n平均分,' + results.average;
+      break;
+    }
+    case 'leaderboard': {
+      const results = getVoteResults(interactionId);
+      csv = formatCsv(['排名', '选项', '票数', '百分比'],
+        results.options
+          .sort((a, b) => b.count - a.count)
+          .map((o, i) => {
+            const pct = results.total > 0 ? Math.round((o.count / results.total) * 100) + '%' : '0%';
+            return [String(i + 1), o.option_text, String(o.count), pct];
+          }));
       break;
     }
     case 'qa': {
