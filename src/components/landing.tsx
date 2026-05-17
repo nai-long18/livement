@@ -42,11 +42,12 @@ export function LandingPage() {
   const [joinCode, setJoinCode] = useState('');
   const [creating, setCreating] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [greeting] = useState(getGreeting);
+  const [greeting, setGreeting] = useState('');
   const [recentRooms, setRecentRooms] = useState<RecentRoom[]>([]);
   const [clipboardHint, setClipboardHint] = useState('');
 
   useEffect(() => {
+    setGreeting(getGreeting());
     setRecentRooms(loadRecent());
   }, []);
 
