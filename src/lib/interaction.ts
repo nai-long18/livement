@@ -2,7 +2,7 @@
 import db from './db';
 import { nanoid } from 'nanoid';
 
-export type InteractionType = 'poll' | 'qa' | 'wordcloud';
+export type InteractionType = 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
 export type InteractionStatus = 'pending' | 'live' | 'closed';
 
 export interface Interaction {
@@ -118,6 +118,26 @@ export function getVoteResults(interactionId: string): { total: number; options:
   const total = options.reduce((sum, o) => sum + o.count, 0);
 
   return { total, options };
+}
+
+export function submitMultiVote(
+  interactionId: string,
+  optionTexts: string[],
+  voterId: string
+): void {
+  const run = db.transaction(() => {
+    // Delete all previous votes from this voter for this interaction
+    db.prepare('DELETE FROM vote WHERE interaction_id = ? AND voter_id = ?')
+      .run(interactionId, voterId);
+    // Insert new rows
+    const stmt = db.prepare(
+      'INSERT INTO vote (id, interaction_id, option_text, voter_id) VALUES (?, ?, ?, ?)'
+    );
+    for (const opt of optionTexts) {
+      stmt.run(nanoid(), interactionId, opt, voterId);
+    }
+  });
+  run();
 }
 
 // --- Questions (Q&A) ---

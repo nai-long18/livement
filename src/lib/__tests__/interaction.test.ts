@@ -13,7 +13,7 @@ vi.mock('../db', () => {
     );
     CREATE TABLE IF NOT EXISTS interaction (
       id TEXT PRIMARY KEY, room_id TEXT NOT NULL REFERENCES room(id) ON DELETE CASCADE,
-      type TEXT NOT NULL CHECK(type IN ('poll', 'qa', 'wordcloud')),
+      type TEXT NOT NULL CHECK(type IN ('poll', 'qa', 'wordcloud', 'rating', 'leaderboard')),
       title TEXT NOT NULL DEFAULT '', config TEXT NOT NULL DEFAULT '{}',
       status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'live', 'closed')),
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -41,7 +41,7 @@ import {
   createInteraction, getRoomInteractions, updateInteractionStatus,
   getInteraction, submitVote, getVoteResults,
   submitQuestion, getQuestions, upvoteQuestion,
-  submitWord, getWordCloudData,
+  submitWord, getWordCloudData, submitMultiVote,
 } from '../interaction';
 
 const ROOM = 'R001';
@@ -126,5 +126,54 @@ describe('interaction', () => {
     expect(data[0].count).toBe(2);
     expect(data[1].word).toBe('rust');
     expect(data[1].count).toBe(1);
+  });
+
+  it('createInteraction accepts rating type', () => {
+    const i = createInteraction(ROOM, 'rating', '评分', {
+      ratingType: 'star', min: 1, max: 5,
+    });
+    expect(i.type).toBe('rating');
+    const config = JSON.parse(i.config);
+    expect(config.ratingType).toBe('star');
+    expect(config.max).toBe(5);
+  });
+
+  it('createInteraction accepts leaderboard type', () => {
+    const i = createInteraction(ROOM, 'leaderboard', '排行榜', {
+      options: ['A', 'B', 'C'], maxSelect: 3,
+    });
+    expect(i.type).toBe('leaderboard');
+    const config = JSON.parse(i.config);
+    expect(config.options).toEqual(['A', 'B', 'C']);
+    expect(config.maxSelect).toBe(3);
+  });
+
+  it('submitMultiVote inserts multiple votes for leaderboard', () => {
+    const i = createInteraction(ROOM, 'leaderboard', 'LB', {
+      options: ['X', 'Y', 'Z'], maxSelect: 2,
+    });
+    updateInteractionStatus(i.id, 'live');
+
+    submitMultiVote(i.id, ['X', 'Z'], 'voter1');
+
+    const results = getVoteResults(i.id);
+    expect(results.total).toBe(2);
+    expect(results.options.find((o: { option_text: string }) => o.option_text === 'X')!.count).toBe(1);
+    expect(results.options.find((o: { option_text: string }) => o.option_text === 'Z')!.count).toBe(1);
+  });
+
+  it('submitMultiVote replaces previous votes on re-submit', () => {
+    const i = createInteraction(ROOM, 'leaderboard', 'LB2', {
+      options: ['A', 'B', 'C'], maxSelect: 2,
+    });
+    updateInteractionStatus(i.id, 'live');
+
+    submitMultiVote(i.id, ['A', 'B'], 'voter2');
+    submitMultiVote(i.id, ['B', 'C'], 'voter2'); // re-submit
+
+    const results = getVoteResults(i.id);
+    expect(results.total).toBe(2); // still 2, not 4
+    expect(results.options.find((o: { option_text: string }) => o.option_text === 'B')!.count).toBe(1);
+    expect(results.options.find((o: { option_text: string }) => o.option_text === 'C')!.count).toBe(1);
   });
 });
