@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createRoom, getRoom } from '@/lib/room';
+import { getOrCreateSessionId } from '@/lib/session';
+import { rateLimitByIp } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const rl = rateLimitByIp(request, 10, 60_000);
+  if (!rl.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
   const body = await request.json().catch(() => ({}));
   const title = body.title || '';
-  const room = createRoom(title);
+  const creatorSid = await getOrCreateSessionId();
+  const room = createRoom(title, creatorSid);
   return NextResponse.json(room, { status: 201 });
 }
 

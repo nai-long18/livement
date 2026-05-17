@@ -10,14 +10,15 @@ export interface Room {
   title: string;
   created_at: string;
   status: 'active' | 'closed';
+  creator_sid: string;
 }
 
-export function createRoom(title: string = ''): Room {
+export function createRoom(title: string = '', creatorSid: string = ''): Room {
   const id = nanoid(4); // 4-char code for easy sharing
   const stmt = db.prepare(
-    'INSERT INTO room (id, title) VALUES (?, ?)'
+    'INSERT INTO room (id, title, creator_sid) VALUES (?, ?, ?)'
   );
-  stmt.run(id, title);
+  stmt.run(id, title, creatorSid);
   return getRoom(id)!;
 }
 

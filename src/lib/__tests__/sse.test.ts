@@ -38,7 +38,7 @@ describe('sse', () => {
   });
 
   it('createSSEStream creates a ReadableStream', () => {
-    const stream = createSSEStream((_send, close) => close());
+    const stream = createSSEStream((_send, close) => { close(); return () => {}; });
     expect(stream).toBeInstanceOf(ReadableStream);
   });
 
@@ -46,6 +46,7 @@ describe('sse', () => {
     const stream = createSSEStream((send, close) => {
       send({ type: 'vote', data: { count: 5 } });
       close();
+      return () => {};
     });
 
     const text = await new Response(stream).text();
