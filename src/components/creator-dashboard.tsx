@@ -8,6 +8,8 @@ import { AddInteractionDialog } from '@/components/add-interaction-dialog';
 import { PollResults } from '@/components/poll-results';
 import { QaFeed } from '@/components/qa-feed';
 import { WordCloud } from '@/components/word-cloud';
+import { RatingResults } from '@/components/rating-results';
+import { LeaderboardResults } from '@/components/leaderboard-results';
 import { useSSE } from '@/hooks/use-sse';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +19,7 @@ import { CountdownTimer } from '@/components/countdown-timer';
 
 interface InteractionData {
   id: string;
-  type: 'poll' | 'qa' | 'wordcloud';
+  type: 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
   title: string;
   status: 'pending' | 'live' | 'closed';
   config?: string;
@@ -32,7 +34,7 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
   const [participantCount, setParticipantCount] = useState({ creators: 0, audience: 0 });
   const [showExport, setShowExport] = useState(false);
 
-  const typeLabel: Record<string, string> = { poll: '投票', qa: '问答', wordcloud: '词云' };
+  const typeLabel: Record<string, string> = { poll: '投票', qa: '问答', wordcloud: '词云', rating: '评分', leaderboard: '排行榜' };
 
   const fetchInteractions = useCallback(async () => {
     const res = await fetch(`/api/room/${roomCode}/interaction`);
@@ -237,6 +239,12 @@ export function CreatorDashboard({ roomCode }: { roomCode: string }) {
                   )}
                   {activeInteraction.type === 'wordcloud' && (
                     <WordCloud roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} highlightWord={searchQuery} />
+                  )}
+                  {activeInteraction.type === 'rating' && (
+                    <RatingResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
+                  )}
+                  {activeInteraction.type === 'leaderboard' && (
+                    <LeaderboardResults roomCode={roomCode} interactionId={activeId!} live={activeInteraction.status === 'live'} isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
                   )}
                 </div>
               ) : (

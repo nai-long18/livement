@@ -9,12 +9,12 @@ import { useState } from 'react';
 
 interface InteractionData {
   id: string;
-  type: 'poll' | 'qa' | 'wordcloud';
+  type: 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
   title: string;
   status: 'pending' | 'live' | 'closed';
 }
 
-const typeLabel = { poll: '投票', qa: '问答', wordcloud: '词云' };
+const typeLabel = { poll: '投票', qa: '问答', wordcloud: '词云', rating: '评分', leaderboard: '排行榜' };
 
 export function InteractionQueue({
   interactions,
