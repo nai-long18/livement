@@ -11,10 +11,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QaFeed } from '@/components/qa-feed';
 import { PollResults } from '@/components/poll-results';
 import { CountdownTimer } from '@/components/countdown-timer';
+import { RatingResults } from '@/components/rating-results';
+import { LeaderboardResults } from '@/components/leaderboard-results';
 
 interface ActiveInteraction {
   id: string;
-  type: 'poll' | 'qa' | 'wordcloud';
+  type: 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
   title: string;
   config: string;
 }
@@ -48,6 +50,10 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
   const [resultPreview, setResultPreview] = useState<unknown>(null);
   const [pollOptions, setPollOptions] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [ratingValue, setRatingValue] = useState('');
+  const [ratingType, setRatingType] = useState<'star' | 'nps'>('star');
+  const [leaderboardOptions, setLeaderboardOptions] = useState<string[]>([]);
+  const [maxLeaderboardSelect, setMaxLeaderboardSelect] = useState(3);
 
   useEffect(() => {
     fetch(`/api/room/${roomCode}/interaction`)
@@ -65,6 +71,19 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
             const config = JSON.parse(live.config);
             if (config.options) setPollOptions(config.options);
             if (config.multiple) setIsMultiple(config.multiple);
+            if (live.type === 'rating') {
+              try {
+                const cfg2 = JSON.parse(live.config);
+                if (cfg2.ratingType) setRatingType(cfg2.ratingType);
+              } catch { /* ignore */ }
+            }
+            if (live.type === 'leaderboard') {
+              try {
+                const cfg2 = JSON.parse(live.config);
+                if (cfg2.options) setPollOptions(cfg2.options);
+                if (cfg2.maxSelect) setMaxLeaderboardSelect(cfg2.maxSelect);
+              } catch { /* ignore */ }
+            }
           } catch { setPollOptions([]); }
         } else {
           setPageState('waiting');
@@ -149,6 +168,39 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
     const data = await res.json();
     setResultPreview(data);
     setWordInput('');
+    setSubmitted(true);
+  }
+
+  async function submitRating() {
+    if (!sessionId || !interaction) return;
+    if (!ratingValue) return;
+
+    await fetch(`/api/room/${roomCode}/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        interactionId: interaction.id,
+        optionText: ratingValue,
+        voterId: sessionId,
+      }),
+    });
+    setSubmitted(true);
+  }
+
+  async function submitLeaderboard() {
+    if (!sessionId || !interaction) return;
+    if (leaderboardOptions.length === 0) return;
+
+    await fetch(`/api/room/${roomCode}/vote`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        interactionId: interaction.id,
+        optionTexts: leaderboardOptions,
+        voterId: sessionId,
+      }),
+    });
+    setResultPreview({ total: leaderboardOptions.length });
     setSubmitted(true);
   }
 
@@ -312,6 +364,103 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
               </div>
             )}
 
+            {interaction.type === 'rating' && !submitted && (
+              <div className="space-y-4">
+                {ratingType === 'star' ? (
+                  <div className="flex justify-center gap-1.5">
+                    {[1, 2, 3, 4, 5].map(n => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setRatingValue(String(n))}
+                        className={`text-4xl transition-all ${
+                          Number(ratingValue) >= n
+                            ? 'text-amber-400 scale-110'
+                            : 'text-slate-600 hover:text-amber-300/60'
+                        }`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex justify-between text-xs text-slate-500 mb-1.5 px-1">
+                      <span>{interaction && (() => { try { return JSON.parse(interaction.config).lowLabel || '完全不可能'; } catch { return '完全不可能'; } })()}</span>
+                      <span>{interaction && (() => { try { return JSON.parse(interaction.config).highLabel || '一定会'; } catch { return '一定会'; } })()}</span>
+                    </div>
+                    <div className="flex gap-1">
+                      {Array.from({ length: 11 }, (_, n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setRatingValue(String(n))}
+                          className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                            ratingValue === String(n)
+                              ? 'bg-primary text-primary-foreground scale-105'
+                              : n <= 6
+                                ? 'bg-red-950/30 text-red-300/60 hover:bg-red-900/40'
+                                : n <= 8
+                                  ? 'bg-yellow-950/30 text-yellow-300/60 hover:bg-yellow-900/40'
+                                  : 'bg-green-950/30 text-green-300/60 hover:bg-green-900/40'
+                          }`}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <p className="text-center text-sm text-slate-400">
+                  {ratingValue ? `你的评分: ${ratingValue}` : '点击选择评分'}
+                </p>
+                <Button onClick={submitRating} disabled={!ratingValue} className="w-full">
+                  提交评分
+                </Button>
+              </div>
+            )}
+
+            {interaction.type === 'leaderboard' && !submitted && (
+              <div className="space-y-2">
+                <p className="text-xs text-slate-400">最多选择 {maxLeaderboardSelect} 个</p>
+                {pollOptions.map((option, i) => (
+                  <label
+                    key={i}
+                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                      leaderboardOptions.includes(option)
+                        ? 'border-primary bg-primary/10'
+                        : leaderboardOptions.length >= maxLeaderboardSelect
+                          ? 'border-slate-200 dark:border-slate-700 opacity-40 cursor-not-allowed'
+                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      value={option}
+                      checked={leaderboardOptions.includes(option)}
+                      disabled={leaderboardOptions.length >= maxLeaderboardSelect && !leaderboardOptions.includes(option)}
+                      onChange={e => {
+                        if (e.target.checked) {
+                          setLeaderboardOptions(prev => [...prev, option]);
+                        } else {
+                          setLeaderboardOptions(prev => prev.filter(o => o !== option));
+                        }
+                      }}
+                      className="w-4 h-4 accent-primary rounded"
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+                <Button
+                  onClick={submitLeaderboard}
+                  disabled={leaderboardOptions.length === 0}
+                  className="w-full mt-3"
+                >
+                  提交投票
+                </Button>
+              </div>
+            )}
+
             {submitted && (
               <div className="text-center py-4">
                 <p className="text-green-500 text-lg mb-2">✓ 已提交</p>
@@ -324,6 +473,8 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
                     setSubmitted(false);
                     setSelectedOption('');
                     setSelectedOptions([]);
+                    setRatingValue('');
+                    setLeaderboardOptions([]);
                   }}
                 >
                   {interaction.type === 'qa' ? '再提一个问题' : '修改回答'}
@@ -342,6 +493,22 @@ export function AudienceView({ roomCode }: { roomCode: string }) {
             {interaction.type === 'qa' && (
               <QaFeed roomCode={roomCode} interactionId={interaction.id} searchQuery={searchQuery} />
             )}
+
+            {interaction.type === 'rating' && submitted && (() => {
+              const config = JSON.parse(interaction.config);
+              const revealed = config.revealed === true;
+              return revealed ? (
+                <RatingResults roomCode={roomCode} interactionId={interaction.id} live={false} initialRevealed={revealed} />
+              ) : null;
+            })()}
+
+            {interaction.type === 'leaderboard' && submitted && (() => {
+              const config = JSON.parse(interaction.config);
+              const revealed = config.revealed === true;
+              return revealed ? (
+                <LeaderboardResults roomCode={roomCode} interactionId={interaction.id} live={false} initialRevealed={revealed} />
+              ) : null;
+            })()}
 
           </Card>
         </motion.div>
