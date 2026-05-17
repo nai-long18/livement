@@ -37,6 +37,44 @@ function saveRecent(room: RecentRoom) {
   localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 5)));
 }
 
+function Stars() {
+  const dots = Array.from({ length: 40 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    r: Math.random() * 1.5 + 0.5,
+    duration: Math.random() * 4 + 3,
+    delay: Math.random() * 4,
+  }));
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {dots.map(d => (
+        <motion.div
+          key={d.id}
+          className="absolute rounded-full bg-white/40"
+          style={{ left: `${d.x}%`, top: `${d.y}%`, width: d.r, height: d.r }}
+          animate={{ opacity: [0.1, 0.6, 0.1], scale: [1, 1.8, 1] }}
+          transition={{ repeat: Infinity, duration: d.duration, delay: d.delay, ease: 'easeInOut' }}
+        />
+      ))}
+      {/* Large orbs — subtle aurora glow */}
+      <motion.div
+        className="absolute w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(59,130,246,0.04)', left: '-10%', top: '-20%' }}
+        animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+        transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(6,182,212,0.03)', right: '-5%', bottom: '-15%' }}
+        animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
+        transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
+      />
+    </div>
+  );
+}
+
 export function LandingPage() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
@@ -99,18 +137,8 @@ export function LandingPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-      {/* Ambient background glow */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none"
-        animate={{
-          background: [
-            'radial-gradient(ellipse at 30% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)',
-            'radial-gradient(ellipse at 70% 40%, rgba(6,182,212,0.06) 0%, transparent 60%)',
-            'radial-gradient(ellipse at 30% 50%, rgba(59,130,246,0.08) 0%, transparent 60%)',
-          ],
-        }}
-        transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
-      />
+      {/* Animated star particles */}
+      <Stars />
 
       <AnimatePresence mode="wait">
         {countdown !== null ? (
@@ -152,31 +180,37 @@ export function LandingPage() {
             <h1 className="text-4xl font-bold text-white mb-2">LiveMent</h1>
             <p className="text-slate-400 mb-8">实时互动，三秒开始</p>
 
-            {/* Create button with glow */}
+            {/* CTA — brand gradient with glow */}
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className="mb-4"
             >
-              <Button
-                size="lg"
-                className="w-full text-lg relative overflow-hidden"
-                onClick={handleCreate}
+              <motion.button
+                type="button"
                 disabled={creating}
+                onClick={handleCreate}
+                className="relative w-full py-3.5 rounded-xl text-lg font-semibold text-white overflow-hidden disabled:opacity-60 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_50px_rgba(59,130,246,0.5)] transition-shadow"
+                animate={{
+                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                }}
+                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
+                style={{ backgroundSize: '200% 100%' }}
               >
+                {/* Shine sweep */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
                   animate={{ x: ['-100%', '100%'] }}
                   transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                 />
                 {creating ? '创建中...' : '＋ 创建新房间'}
-              </Button>
+              </motion.button>
             </motion.div>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-slate-700" />
+              <div className="flex-1 h-px bg-slate-700/50" />
               <span className="text-slate-500 text-sm">或</span>
-              <div className="flex-1 h-px bg-slate-700" />
+              <div className="flex-1 h-px bg-slate-700/50" />
             </div>
 
             {/* Join form */}
@@ -205,9 +239,23 @@ export function LandingPage() {
                   </svg>
                 </button>
               </div>
-              <Button type="submit" variant="secondary" disabled={!joinCode.trim()}>
+              <motion.button
+                type="submit"
+                disabled={!joinCode.trim()}
+                animate={{
+                  background: joinCode.trim()
+                    ? 'linear-gradient(135deg, #3b82f6, #06b6d4)'
+                    : 'rgb(51,65,85)',
+                  color: joinCode.trim() ? '#fff' : 'rgb(148,163,184)',
+                  boxShadow: joinCode.trim()
+                    ? '0 0 16px rgba(59,130,246,0.3)'
+                    : 'none',
+                }}
+                transition={{ duration: 0.3 }}
+                className="px-5 py-2 rounded-xl text-sm font-semibold disabled:cursor-not-allowed transition-colors"
+              >
                 加入
-              </Button>
+              </motion.button>
             </form>
 
             {/* Clipboard hint */}
