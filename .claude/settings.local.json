@@ -55,7 +55,8 @@
       "mcp__browser__browser_run_code_unsafe",
       "Bash(node -e \"process.stdin.setEncoding\\('utf8'\\); let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>console.log\\(JSON.stringify\\(JSON.parse\\(d\\),null,2\\)\\)\\)\")",
       "Bash(node *)",
-      "mcp__browser__browser_evaluate"
+      "mcp__browser__browser_evaluate",
+      "Bash(curl -s \"http://174.138.18.249:8080/api/room/WPt3/export?type=poll&interactionId=GNJ3A4MFTCd--9fJB4Njo\")"
     ]
   }
 }
