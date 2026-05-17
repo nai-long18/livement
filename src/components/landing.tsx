@@ -177,7 +177,7 @@ export function LandingPage() {
           >
             {/* Greeting — cold blue-gray, lighter for small-text legibility */}
             <motion.p
-              className="text-[#8b95a5] text-sm font-light tracking-wide mb-8"
+              className="text-[#9ca3af] text-sm font-light tracking-wide mb-8"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -187,7 +187,7 @@ export function LandingPage() {
 
             {/* Title group — close proximity */}
             <h1 className="text-5xl font-bold text-white mb-2 tracking-tight">LiveMent</h1>
-            <p className="text-white/50 text-sm font-light mb-14">实时互动，三秒开始</p>
+            <p className="text-[#9ca3af] text-sm font-light mb-14">实时互动，三秒开始</p>
 
             {/* CTA — sapphire jewel button */}
             <motion.div
