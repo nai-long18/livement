@@ -37,51 +37,47 @@ function saveRecent(room: RecentRoom) {
   localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 5)));
 }
 
-function Stars() {
-  // Deterministic star positions so they don't move on re-render
-  const dots = Array.from({ length: 60 }, (_, i) => {
-    const seed = i * 137.508; // golden angle for even distribution
-    return {
-      id: i,
-      x: ((seed * 7 + i * 13) % 100),
-      y: ((seed * 11 + i * 17) % 100),
-      r: (i % 5 === 0) ? 2.5 : ((i % 3 === 0) ? 1.8 : 1),
-      opacity: (i % 5 === 0) ? 0.9 : ((i % 3 === 0) ? 0.5 : 0.25),
-      duration: 2.5 + (i % 3) * 1.5,
-      delay: (i * 0.3) % 4,
-    };
-  });
-
+function AuroraBackground() {
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
-      {dots.map(d => (
-        <motion.div
-          key={d.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${d.x}%`,
-            top: `${d.y}%`,
-            width: d.r,
-            height: d.r,
-            background: d.r > 2 ? 'rgba(255,255,255,0.9)' : 'rgba(147,197,253,0.7)',
-            boxShadow: d.r > 2 ? '0 0 6px rgba(147,197,253,0.6), 0 0 12px rgba(147,197,253,0.3)' : 'none',
-          }}
-          animate={{ opacity: [d.opacity * 0.3, d.opacity, d.opacity * 0.3] }}
-          transition={{ repeat: Infinity, duration: d.duration, delay: d.delay, ease: 'easeInOut' }}
-        />
-      ))}
-      {/* Aurora orbs */}
+      {/* Deep space backdrop — center stage light behind content */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px]"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(30,64,175,0.12) 0%, rgba(15,23,42,0) 70%)',
+        }}
+      />
+      {/* Top-left aurora — cool blue */}
       <motion.div
-        className="absolute w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: 'rgba(59,130,246,0.06)', left: '-15%', top: '-25%' }}
-        animate={{ x: [0, 60, 0], y: [0, -40, 0] }}
+        className="absolute w-[900px] h-[600px] rounded-full"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(37,99,235,0.1) 0%, transparent 65%)',
+          left: '-20%', top: '-15%',
+          filter: 'blur(80px)',
+        }}
+        animate={{ x: [0, 30, -10, 0], y: [0, -20, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 16, ease: 'easeInOut' }}
+      />
+      {/* Bottom-right aurora — cyan tint */}
+      <motion.div
+        className="absolute w-[800px] h-[500px] rounded-full"
+        style={{
+          background: 'radial-gradient(ellipse at center, rgba(6,182,212,0.07) 0%, transparent 65%)',
+          right: '-15%', bottom: '-10%',
+          filter: 'blur(80px)',
+        }}
+        animate={{ x: [0, -40, 10, 0], y: [0, 25, -15, 0] }}
         transition={{ repeat: Infinity, duration: 14, ease: 'easeInOut' }}
       />
+      {/* Subtle top edge light */}
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: 'rgba(6,182,212,0.05)', right: '-10%', bottom: '-20%' }}
-        animate={{ x: [0, -50, 0], y: [0, 30, 0] }}
-        transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut' }}
+        className="absolute w-full h-[400px]"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(147,197,253,0.04) 0%, transparent 70%)',
+          top: 0, left: 0,
+        }}
+        animate={{ opacity: [0.6, 1, 0.6] }}
+        transition={{ repeat: Infinity, duration: 8, ease: 'easeInOut' }}
       />
     </div>
   );
@@ -149,8 +145,8 @@ export function LandingPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
-      {/* Animated star particles */}
-      <Stars />
+      {/* Aurora ambient glow */}
+      <AuroraBackground />
 
       <AnimatePresence mode="wait">
         {countdown !== null ? (
@@ -181,7 +177,7 @@ export function LandingPage() {
           >
             {/* Greeting */}
             <motion.p
-              className="text-slate-500 text-sm mb-2"
+              className="text-blue-200/50 text-sm font-light tracking-wide mb-6"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -189,55 +185,61 @@ export function LandingPage() {
               {greeting}今天想和谁连线？
             </motion.p>
 
-            <h1 className="text-4xl font-bold text-white mb-2">LiveMent</h1>
-            <p className="text-slate-400 mb-8">实时互动，三秒开始</p>
+            <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">LiveMent</h1>
+            <p className="text-blue-200/40 text-sm font-light mb-12">实时互动，三秒开始</p>
 
-            {/* CTA — brand gradient with glow */}
+            {/* CTA — refined jewel-like button */}
             <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="mb-4"
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.985 }}
+              className="mb-5"
             >
               <motion.button
                 type="button"
                 disabled={creating}
                 onClick={handleCreate}
-                className="relative w-full py-3.5 rounded-xl text-lg font-semibold text-white overflow-hidden disabled:opacity-60 bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500 shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_50px_rgba(59,130,246,0.5)] transition-shadow"
-                animate={{
-                  backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+                className="relative w-full py-4 rounded-2xl text-lg font-semibold text-white overflow-hidden disabled:opacity-50 group"
+                style={{
+                  background: 'linear-gradient(180deg, #3b82f6 0%, #2563eb 100%)',
+                  boxShadow: [
+                    '0 2px 4px rgba(0,0,0,0.3)',
+                    '0 6px 20px -4px rgba(37,99,235,0.4)',
+                    '0 12px 40px -8px rgba(37,99,235,0.25)',
+                    'inset 0 1px 0 rgba(255,255,255,0.15)',
+                  ].join(', '),
                 }}
-                transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
-                style={{ backgroundSize: '200% 100%' }}
               >
-                {/* Shine sweep */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent"
-                  animate={{ x: ['-100%', '100%'] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+                {/* Inner top highlight — glass feel */}
+                <div className="absolute inset-0 rounded-2xl pointer-events-none"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 40%)' }}
                 />
-                {creating ? '创建中...' : '＋ 创建新房间'}
+                {/* Subtle center glow on hover */}
+                <div className="absolute inset-0 rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{ background: 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 60%)' }}
+                />
+                <span className="relative z-10">{creating ? '创建中...' : '＋ 创建新房间'}</span>
               </motion.button>
             </motion.div>
 
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 h-px bg-slate-700/50" />
-              <span className="text-slate-500 text-sm">或</span>
-              <div className="flex-1 h-px bg-slate-700/50" />
+            <div className="flex items-center gap-3 mb-5">
+              <div className="flex-1 h-px bg-white/[0.06]" />
+              <span className="text-slate-500 text-xs font-light tracking-wider">或</span>
+              <div className="flex-1 h-px bg-white/[0.06]" />
             </div>
 
-            {/* Join form */}
-            <form onSubmit={handleJoin} className="flex gap-2 mb-3">
+            {/* Join form — glassmorphism */}
+            <form onSubmit={handleJoin} className="flex gap-2.5 mb-3">
               <div className="relative flex-1">
                 <Input
                   value={joinCode}
                   onChange={e => setJoinCode(e.target.value.toUpperCase())}
                   placeholder="输入房间码"
-                  className="text-center text-lg tracking-widest uppercase pr-9"
+                  className="text-center text-lg tracking-widest uppercase font-mono border-white/[0.08] bg-white/[0.03] backdrop-blur-sm text-white placeholder:text-slate-500 rounded-xl h-11"
                   maxLength={6}
                 />
                 <button
                   type="button"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-200 transition-colors"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-blue-300 transition-colors"
                   title="粘贴"
                   onClick={async () => {
                     try {
@@ -256,15 +258,16 @@ export function LandingPage() {
                 disabled={!joinCode.trim()}
                 animate={{
                   background: joinCode.trim()
-                    ? 'linear-gradient(135deg, #3b82f6, #06b6d4)'
-                    : 'rgb(51,65,85)',
-                  color: joinCode.trim() ? '#fff' : 'rgb(148,163,184)',
+                    ? 'linear-gradient(180deg, #3b82f6, #2563eb)'
+                    : 'linear-gradient(180deg, rgba(30,41,59,0.8), rgba(15,23,42,0.8))',
+                  color: joinCode.trim() ? '#fff' : '#64748b',
                   boxShadow: joinCode.trim()
-                    ? '0 0 16px rgba(59,130,246,0.3)'
-                    : 'none',
+                    ? '0 0 20px -4px rgba(59,130,246,0.35)'
+                    : 'inset 0 1px 0 rgba(255,255,255,0.03)',
+                  borderColor: joinCode.trim() ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.06)',
                 }}
                 transition={{ duration: 0.3 }}
-                className="px-5 py-2 rounded-xl text-sm font-semibold disabled:cursor-not-allowed transition-colors"
+                className="px-5 py-2 rounded-xl text-sm font-semibold disabled:cursor-not-allowed border"
               >
                 加入
               </motion.button>
@@ -274,7 +277,7 @@ export function LandingPage() {
             <AnimatePresence>
               {clipboardHint && (
                 <motion.button
-                  className="text-xs text-cyan-400 mb-3 hover:text-cyan-300 transition-colors"
+                  className="text-xs text-blue-300/80 mb-3 hover:text-blue-200 transition-colors"
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
@@ -285,7 +288,7 @@ export function LandingPage() {
               )}
             </AnimatePresence>
 
-            {/* Recent rooms */}
+            {/* Recent rooms — glass pill tags */}
             <AnimatePresence>
               {recentRooms.length > 0 && (
                 <motion.div
@@ -294,14 +297,14 @@ export function LandingPage() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
                 >
-                  <span className="text-xs text-slate-500">最近：</span>
+                  <span className="text-xs text-slate-500 font-light">最近：</span>
                   {recentRooms.slice(0, 3).map(room => (
                     <motion.button
                       key={room.code}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800/60 text-slate-300 hover:bg-slate-700/80 hover:text-white border border-slate-700/50 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-white/[0.04] backdrop-blur-sm text-slate-300 hover:bg-white/[0.08] hover:text-white border border-white/[0.06] transition-colors cursor-pointer"
                       onClick={() => handleRecentClick(room)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
                       title={room.title}
                     >
                       {room.title.length > 8 ? room.title.slice(0, 8) + '…' : room.title}
