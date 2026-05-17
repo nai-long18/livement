@@ -23,7 +23,7 @@ export async function POST(
     config?: object;
   };
 
-  if (!type || !['poll', 'qa', 'wordcloud'].includes(type)) {
+  if (!type || !['poll', 'qa', 'wordcloud', 'rating', 'leaderboard'].includes(type)) {
     return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
   }
 
