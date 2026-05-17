@@ -8,13 +8,15 @@ import { Button } from '@/components/ui/button';
 import { PollResults } from '@/components/poll-results';
 import { QaFeed } from '@/components/qa-feed';
 import { WordCloud } from '@/components/word-cloud';
+import { RatingResults } from '@/components/rating-results';
+import { LeaderboardResults } from '@/components/leaderboard-results';
 import { CountdownTimer } from '@/components/countdown-timer';
 import QRCode from 'qrcode';
 
 export function PresentationView({ roomCode }: { roomCode: string }) {
   const [activeInteraction, setActiveInteraction] = useState<{
     id: string;
-    type: 'poll' | 'qa' | 'wordcloud';
+    type: 'poll' | 'qa' | 'wordcloud' | 'rating' | 'leaderboard';
     title: string;
     status: string;
     config?: string;
@@ -89,6 +91,12 @@ export function PresentationView({ roomCode }: { roomCode: string }) {
               )}
               {activeInteraction.type === 'wordcloud' && (
                 <WordCloud roomCode={roomCode} interactionId={activeInteraction.id} live />
+              )}
+              {activeInteraction.type === 'rating' && (
+                <RatingResults roomCode={roomCode} interactionId={activeInteraction.id} live isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
+              )}
+              {activeInteraction.type === 'leaderboard' && (
+                <LeaderboardResults roomCode={roomCode} interactionId={activeInteraction.id} live isCreator initialRevealed={activeInteraction.config ? JSON.parse(activeInteraction.config).revealed === true : false} />
               )}
             </motion.div>
           ) : (
