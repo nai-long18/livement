@@ -38,38 +38,50 @@ function saveRecent(room: RecentRoom) {
 }
 
 function Stars() {
-  const dots = Array.from({ length: 40 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    r: Math.random() * 1.5 + 0.5,
-    duration: Math.random() * 4 + 3,
-    delay: Math.random() * 4,
-  }));
+  // Deterministic star positions so they don't move on re-render
+  const dots = Array.from({ length: 60 }, (_, i) => {
+    const seed = i * 137.508; // golden angle for even distribution
+    return {
+      id: i,
+      x: ((seed * 7 + i * 13) % 100),
+      y: ((seed * 11 + i * 17) % 100),
+      r: (i % 5 === 0) ? 2.5 : ((i % 3 === 0) ? 1.8 : 1),
+      opacity: (i % 5 === 0) ? 0.9 : ((i % 3 === 0) ? 0.5 : 0.25),
+      duration: 2.5 + (i % 3) * 1.5,
+      delay: (i * 0.3) % 4,
+    };
+  });
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {dots.map(d => (
         <motion.div
           key={d.id}
-          className="absolute rounded-full bg-white/40"
-          style={{ left: `${d.x}%`, top: `${d.y}%`, width: d.r, height: d.r }}
-          animate={{ opacity: [0.1, 0.6, 0.1], scale: [1, 1.8, 1] }}
+          className="absolute rounded-full"
+          style={{
+            left: `${d.x}%`,
+            top: `${d.y}%`,
+            width: d.r,
+            height: d.r,
+            background: d.r > 2 ? 'rgba(255,255,255,0.9)' : 'rgba(147,197,253,0.7)',
+            boxShadow: d.r > 2 ? '0 0 6px rgba(147,197,253,0.6), 0 0 12px rgba(147,197,253,0.3)' : 'none',
+          }}
+          animate={{ opacity: [d.opacity * 0.3, d.opacity, d.opacity * 0.3] }}
           transition={{ repeat: Infinity, duration: d.duration, delay: d.delay, ease: 'easeInOut' }}
         />
       ))}
-      {/* Large orbs — subtle aurora glow */}
+      {/* Aurora orbs */}
       <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: 'rgba(59,130,246,0.04)', left: '-10%', top: '-20%' }}
-        animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
-        transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut' }}
+        className="absolute w-[700px] h-[700px] rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(59,130,246,0.06)', left: '-15%', top: '-25%' }}
+        animate={{ x: [0, 60, 0], y: [0, -40, 0] }}
+        transition={{ repeat: Infinity, duration: 14, ease: 'easeInOut' }}
       />
       <motion.div
-        className="absolute w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none"
-        style={{ background: 'rgba(6,182,212,0.03)', right: '-5%', bottom: '-15%' }}
-        animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
-        transition={{ repeat: Infinity, duration: 10, ease: 'easeInOut' }}
+        className="absolute w-[600px] h-[600px] rounded-full blur-3xl pointer-events-none"
+        style={{ background: 'rgba(6,182,212,0.05)', right: '-10%', bottom: '-20%' }}
+        animate={{ x: [0, -50, 0], y: [0, 30, 0] }}
+        transition={{ repeat: Infinity, duration: 12, ease: 'easeInOut' }}
       />
     </div>
   );
